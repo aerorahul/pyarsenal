@@ -27,6 +27,7 @@ class _Container(object):
     '''
     Define an empty container class
     '''
+
     def __init__(self):
         '''
         Create an empty container class
@@ -364,7 +365,8 @@ def field_specs(vnam):
     elif (vnam == 'AICE'):
         strout.name = 'ice-area'
         strout.name_short = 'aice'
-        strout.cntrs = _np.array([0.01, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99])
+        strout.cntrs = _np.array(
+            [0.01, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99])
         strout.clab = list(strout.cntrs[:])
         strout.ylab = 'm$^2$'
         strout.units = 'm$^2$'
@@ -374,7 +376,8 @@ def field_specs(vnam):
     elif (vnam == 'HICE'):
         strout.name = 'ice-volume'
         strout.name_short = 'hice'
-        strout.cntrs = _np.array([0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0])
+        strout.cntrs = _np.array(
+            [0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0])
         strout.clab = list(strout.cntrs[:])
         strout.ylab = 'm$^3$'
         strout.units = 'm$^3$'
@@ -424,7 +427,26 @@ def field_specs(vnam):
     elif (vnam == 'DH'):
         strout.name = 'layer-thickness'
         strout.name_short = 'dh'
-        strout.cntrs = _np.array([5.0, 10.0, 20.0, 30.0, 40.0, 50.0, 75.0, 100.0, 200.0, 300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0, 1000.0, 1500.0, 2000.0, 2500.0])
+        strout.cntrs = _np.array([5.0,
+                                  10.0,
+                                  20.0,
+                                  30.0,
+                                  40.0,
+                                  50.0,
+                                  75.0,
+                                  100.0,
+                                  200.0,
+                                  300.0,
+                                  400.0,
+                                  500.0,
+                                  600.0,
+                                  700.0,
+                                  800.0,
+                                  900.0,
+                                  1000.0,
+                                  1500.0,
+                                  2000.0,
+                                  2500.0])
         strout.clab = list(strout.cntrs[:])
         strout.ylab = 'm'
         strout.units = 'm'
@@ -434,7 +456,22 @@ def field_specs(vnam):
     elif (vnam == 'NITRATE'):
         strout.name = 'nitrate'
         strout.name_short = 'rno'
-        strout.cntrs = _np.array([0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0, 5.0, 7.5, 10.0, 25.0, 50.0, 75.0, 100.0])
+        strout.cntrs = _np.array([0.1,
+                                  0.25,
+                                  0.5,
+                                  0.75,
+                                  1.0,
+                                  1.5,
+                                  2.0,
+                                  3.0,
+                                  4.0,
+                                  5.0,
+                                  7.5,
+                                  10.0,
+                                  25.0,
+                                  50.0,
+                                  75.0,
+                                  100.0])
         strout.clab = list(strout.cntrs[:])
         strout.ylab = '$\mu$M'
         strout.units = '$\mu$M'
@@ -444,8 +481,43 @@ def field_specs(vnam):
     elif (vnam == 'CHLORO'):
         strout.name = 'chlorophytes'
         strout.name_short = 'chl'
-        strout.cntrs = _np.array([0.01, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.5, 3, 5, 7.5, 10])
-        strout.cntrs = _np.array([0.01, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.6, 0.7, 0.8, 0.9, 1])
+        strout.cntrs = _np.array([0.01,
+                                  0.05,
+                                  0.1,
+                                  0.15,
+                                  0.2,
+                                  0.25,
+                                  0.3,
+                                  0.35,
+                                  0.4,
+                                  0.45,
+                                  0.5,
+                                  0.6,
+                                  0.7,
+                                  0.8,
+                                  0.9,
+                                  1,
+                                  1.5,
+                                  3,
+                                  5,
+                                  7.5,
+                                  10])
+        strout.cntrs = _np.array([0.01,
+                                  0.05,
+                                  0.1,
+                                  0.15,
+                                  0.2,
+                                  0.25,
+                                  0.3,
+                                  0.35,
+                                  0.4,
+                                  0.45,
+                                  0.5,
+                                  0.6,
+                                  0.7,
+                                  0.8,
+                                  0.9,
+                                  1])
         strout.clab = list(strout.cntrs[:])
         strout.ylab = 'mg/m$^3$'
         strout.units = 'mg/m$^3$'
@@ -455,7 +527,22 @@ def field_specs(vnam):
     elif (vnam == 'SILICA'):
         strout.name = 'silica'
         strout.name_short = 'sil'
-        strout.cntrs = _np.array([0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0, 5.0, 7.5, 10.0, 25.0, 50.0, 75.0, 100.0])
+        strout.cntrs = _np.array([0.1,
+                                  0.25,
+                                  0.5,
+                                  0.75,
+                                  1.0,
+                                  1.5,
+                                  2.0,
+                                  3.0,
+                                  4.0,
+                                  5.0,
+                                  7.5,
+                                  10.0,
+                                  25.0,
+                                  50.0,
+                                  75.0,
+                                  100.0])
         strout.clab = list(strout.cntrs[:])
         strout.ylab = '$\mu$M'
         strout.units = '$\mu$M'
@@ -475,8 +562,43 @@ def field_specs(vnam):
     elif (vnam == 'DIATOM'):
         strout.name = 'diatoms'
         strout.name_short = 'dia'
-        strout.cntrs = _np.array([0.01, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.5, 3.0, 5.0, 7.5, 10.0])
-        strout.cntrs = _np.array([0.01, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0])
+        strout.cntrs = _np.array([0.01,
+                                  0.05,
+                                  0.1,
+                                  0.15,
+                                  0.2,
+                                  0.25,
+                                  0.3,
+                                  0.35,
+                                  0.4,
+                                  0.45,
+                                  0.5,
+                                  0.6,
+                                  0.7,
+                                  0.8,
+                                  0.9,
+                                  1.0,
+                                  1.5,
+                                  3.0,
+                                  5.0,
+                                  7.5,
+                                  10.0])
+        strout.cntrs = _np.array([0.01,
+                                  0.05,
+                                  0.1,
+                                  0.15,
+                                  0.2,
+                                  0.25,
+                                  0.3,
+                                  0.35,
+                                  0.4,
+                                  0.45,
+                                  0.5,
+                                  0.6,
+                                  0.7,
+                                  0.8,
+                                  0.9,
+                                  1.0])
         strout.clab = list(strout.cntrs[:])
         strout.ylab = 'mg/m$^3$'
         strout.units = 'mg/m$^3$'
@@ -486,8 +608,43 @@ def field_specs(vnam):
     elif (vnam == 'CYANO'):
         strout.name = 'cyanobacteria'
         strout.name_short = 'cya'
-        strout.cntrs = _np.array([0.01, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.5, 3.0, 5.0, 7.5, 10.0])
-        strout.cntrs = _np.array([0.01, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0])
+        strout.cntrs = _np.array([0.01,
+                                  0.05,
+                                  0.1,
+                                  0.15,
+                                  0.2,
+                                  0.25,
+                                  0.3,
+                                  0.35,
+                                  0.4,
+                                  0.45,
+                                  0.5,
+                                  0.6,
+                                  0.7,
+                                  0.8,
+                                  0.9,
+                                  1.0,
+                                  1.5,
+                                  3.0,
+                                  5.0,
+                                  7.5,
+                                  10.0])
+        strout.cntrs = _np.array([0.01,
+                                  0.05,
+                                  0.1,
+                                  0.15,
+                                  0.2,
+                                  0.25,
+                                  0.3,
+                                  0.35,
+                                  0.4,
+                                  0.45,
+                                  0.5,
+                                  0.6,
+                                  0.7,
+                                  0.8,
+                                  0.9,
+                                  1.0])
         strout.clab = list(strout.cntrs[:])
         strout.ylab = 'mg/m$^3$'
         strout.units = 'mg/m$^3$'
@@ -497,8 +654,43 @@ def field_specs(vnam):
     elif (vnam == 'COCCO'):
         strout.name = 'coccolithophores'
         strout.name_short = 'coc'
-        strout.cntrs = _np.array([0.01, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.5, 3.0, 5.0, 7.5, 10.0])
-        strout.cntrs = _np.array([0.01, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0])
+        strout.cntrs = _np.array([0.01,
+                                  0.05,
+                                  0.1,
+                                  0.15,
+                                  0.2,
+                                  0.25,
+                                  0.3,
+                                  0.35,
+                                  0.4,
+                                  0.45,
+                                  0.5,
+                                  0.6,
+                                  0.7,
+                                  0.8,
+                                  0.9,
+                                  1.0,
+                                  1.5,
+                                  3.0,
+                                  5.0,
+                                  7.5,
+                                  10.0])
+        strout.cntrs = _np.array([0.01,
+                                  0.05,
+                                  0.1,
+                                  0.15,
+                                  0.2,
+                                  0.25,
+                                  0.3,
+                                  0.35,
+                                  0.4,
+                                  0.45,
+                                  0.5,
+                                  0.6,
+                                  0.7,
+                                  0.8,
+                                  0.9,
+                                  1.0])
         strout.clab = list(strout.cntrs[:])
         strout.ylab = 'mg/m$^3$'
         strout.units = 'mg/m$^3$'
@@ -508,7 +700,27 @@ def field_specs(vnam):
     elif (vnam == 'TOT'):
         strout.name = 'total chlorophyll'
         strout.name_short = 'tot'
-        strout.cntrs = _np.array([0.01, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.5, 3.0, 5.0, 7.5, 10.0])
+        strout.cntrs = _np.array([0.01,
+                                  0.05,
+                                  0.1,
+                                  0.15,
+                                  0.2,
+                                  0.25,
+                                  0.3,
+                                  0.35,
+                                  0.4,
+                                  0.45,
+                                  0.5,
+                                  0.6,
+                                  0.7,
+                                  0.8,
+                                  0.9,
+                                  1.0,
+                                  1.5,
+                                  3.0,
+                                  5.0,
+                                  7.5,
+                                  10.0])
         strout.clab = list(strout.cntrs[:])
         strout.ylab = 'mg/m$^3$'
         strout.units = 'mg/m$^3$'
