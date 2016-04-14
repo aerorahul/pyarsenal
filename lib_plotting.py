@@ -18,7 +18,7 @@ __copyright__ = "Copyright 2016, NOAA / NCEP / EMC"
 __license__ = "GPL"
 __status__ = "Prototype"
 __version__ = "0.1"
-__all__ = ['rescale_cmap', 'make_cmap_from_RGB', 'make_cmap_from_NCARG',
+__all__ = ['rescale_cmap', 'make_cmap_from_RGB', 'get_cmap_NCARG',
            'savefigure',
            'get_region_bounds', 'get_plev_bounds', 'tripolar_to_latlon',
            'plot_zonal_mean']
@@ -83,18 +83,18 @@ def make_cmap_from_RGB(name='BlueYellowRed'):
     return cmap
 
 
-def make_cmap_from_NCARG(name='BlueYellowRed'):
+def get_cmap_NCARG(name='MPL_jet', lut=None):
     '''
     NCAR Graphics have some really good colormaps that you wish you could use
     '''
 
-    dir_rgb = '%s/lib/ncarg/colormaps' % (_os.environ['NCARG_ROOT'])
-    filename = '%s/%s.rgb' % (dir_rgb, name)
+    dir_ncarg = '%s/lib/ncarg/colormaps' % (_os.environ['NCARG_ROOT'])
+    filename = '%s/%s.rgb' % (dir_ncarg, name)
 
     try:
         palette = open(filename)
     except IOError:
-        raise IOError('Cannot read RGB file for %s from %s' % (name, dir_rgb))
+        raise IOError('Cannot read NCAR Graphics RGB colormap %s from %s' % (name, dir_ncarg))
 
     lines = palette.readlines()
     tmplines = []
@@ -118,7 +118,7 @@ def make_cmap_from_NCARG(name='BlueYellowRed'):
     for num, line in enumerate(lines):
         carray[num, :] = [float(val) / 255.0 for val in line]
     cmap = _colors.ListedColormap(carray, name=name)
-    _cm.register_cmap(name=name, cmap=cmap)
+    _cm.register_cmap(name=name, cmap=cmap, lut=lut)
 
     return cmap
 
