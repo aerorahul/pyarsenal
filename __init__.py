@@ -35,6 +35,8 @@ from lib_GFS import get_pcoord
 from lib_WRF import latlon_to_ij
 from lib_WRF import ij_to_latlon
 
+from lib_GSI import get_convdiag_indices
+from lib_GSI import get_convdiag_data
 from lib_GSI import get_raddiag_indices
 from lib_GSI import get_raddiag_data
 
