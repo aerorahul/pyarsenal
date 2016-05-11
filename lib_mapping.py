@@ -21,8 +21,6 @@ __version__ = "0.1"
 
 __all__ = ['Projection', 'createMap', 'drawMap']
 
-import numpy as _np
-from matplotlib import mlab as _mlab
 from mpl_toolkits.basemap import Basemap as _Basemap
 
 
@@ -31,7 +29,7 @@ class Projection(object):
     Define a class for Projection
     '''
 
-    def __init__(self, projection='miller',
+    def __init__(self, projection='mill',
                  resolution='c',
                  cenlat=None,
                  cenlon=None,
@@ -112,11 +110,12 @@ class Projection(object):
             print 'projection "%s" has been implemented but not supported yet' % (self.projection)
 
         else:
-            str = 'Error message from : setProj(projection)\n' + \
+            msg = 'Error message from : setProj(projection)\n' + \
                   '   projection %s has not been implemented yet\n' % (self.projection) + \
                   '   valid options for projection are:\n' + \
                   '   "stere" | "npstere" | "spstere" | "mill" | "merc" | "lcc" | "ortho" | "robin"'
-            raise Execption(str)
+            print msg
+            raise
 
         return
 
@@ -169,11 +168,12 @@ def createMap(proj, **kwargs):
                        **kwargs)
 
     else:
-        str = 'Error message from : createMap(proj)\n' + \
+        msg = 'Error message from : createMap(proj)\n' + \
               '   projection %s has not been implemented yet\n' % (proj.projection) + \
               '   valid options for projection are:\n' + \
               '   "stere" | "npstere" | "spstere" | "mill" | "merc" | "lcc" | "ortho" | "robin"'
-        raise Execption(str)
+        print msg
+        raise
 
     return map
 

@@ -29,7 +29,7 @@ from matplotlib import cm as _cm
 from matplotlib import pyplot as _pyplot
 from matplotlib import colors as _colors
 from matplotlib import ticker as _ticker
-
+from matplotlib import mlab as _mlab
 
 def rescale_cmap(cntrs, cmap='jet'):
     '''
@@ -111,7 +111,8 @@ def get_cmap_NCARG(name='MPL_jet', lut=None):
         tmplines.append(line.split()[0:3])
 
     if (len(tmplines) != ncolors):
-        raise Execption('error occurred parsing %s' % filename)
+        print 'error occurred parsing %s' % filename
+        raise
     lines = tmplines
 
     carray = _np.zeros([ncolors, 3])
@@ -121,6 +122,17 @@ def get_cmap_NCARG(name='MPL_jet', lut=None):
     _cm.register_cmap(name=name, cmap=cmap, lut=lut)
 
     return cmap
+
+
+def get_Ndistinct_colors(num_colors):
+    from colorsys import hls_to_rgb as _hls_to_rgb
+    colors=[]
+    for i in _np.arange(0.0, 360.0, 360.0 / num_colors):
+        hue        = i/360.0
+        lightness  = (50 + _np.random.rand() * 10)/100.0
+        saturation = (90 + _np.random.rand() * 10)/100.0
+        colors.append(_hls_to_rgb(hue, lightness, saturation))
+    return colors
 
 
 def savefigure(
@@ -184,7 +196,8 @@ def get_plev_bounds(plevs, plevbotbound=1013.25, plevtopbound=175.0):
     Given pressure levels and bounding levels, return indices of the boundaries
     '''
     if (len(plevs) == 0):
-        raise InputError('plevs is empty, cannot compute plev bounds')
+        print 'plevs is empty, cannot compute plev bounds'
+        raise
     levbot = plevs.tolist().index(min(plevs, key=lambda l: abs(l - plevbotbound)))
     levtop = plevs.tolist().index(min(plevs, key=lambda l: abs(l - plevtopbound)))
     return [levbot, levtop]
@@ -276,7 +289,7 @@ def plot_zonal_mean(
     # draw the (filled) contours
     contour = ax1.contourf(x, y, pdata, levels=clevs, norm=norm)
     if plotOpt.get('zero_contour', False):
-        contourz = ax1.contour(
+        ax1.contour(
             x,
             y,
             pdata,
@@ -334,7 +347,7 @@ def plot_zonal_mean(
         axm = fig.add_axes([pos.x1, pos.y0, 0.02, pos.height], sharey=ax2)
         axm.set_xlim(0., 1.)
         axm.xaxis.set_visible(False)
-        modelLev = axm.hlines(altitude, 0., 1., color='0.5')
+        axm.hlines(altitude, 0., 1., color='0.5')
         axr = axm     # specify y axis for right tick marks and labels
         # turn off tick labels of ax2
         for t in ax2.get_yticklabels():
