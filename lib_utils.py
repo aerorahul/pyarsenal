@@ -57,27 +57,29 @@ def roundNumber(value):
     return round_value
 
 
-def pickle(fname,data):
+def pickle(fname,data,mode='wb'):
     '''
     fname - filename to pickle to
     data  - data to pickle
+    mode - mode to pickle (default: wb)
     '''
     print('pickling ... %s' % fname)
     try:
-        _pickle.dump(data, open(fname, "wb"))
+        _pickle.dump(data, open(fname, mode))
     except _pickle.PicklingError:
         raise
     print ' ... done'
     return
 
 
-def unpickle(fname):
+def unpickle(fname, mode='rb'):
     '''
     fname - filename to unpickle to
+    mode - mode to unpickle (default: rb)
     '''
     print('unpickling ... %s' % fname),
     try:
-        data = _pickle.load(open(fname, "rb"))
+        data = _pickle.load(open(fname, mode))
     except _pickle.UnpicklingError:
         raise
     print ' ... done'
