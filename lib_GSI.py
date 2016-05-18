@@ -17,9 +17,15 @@ __email__ = "rahul.mahajan@nasa.gov"
 __copyright__ = "Copyright 2016, NOAA / NCEP / EMC"
 __license__ = "GPL"
 __status__ = "Prototype"
-__all__ = ['get_convdiag_indices','get_convdiag_data','get_raddiag_indices', 'get_raddiag_data']
+__all__ = ['get_convdiag_indices',
+           'get_convdiag_data',
+           'get_raddiag_indices',
+           'get_raddiag_data',
+           'GSIstat']
 
 import numpy as _np
+import pandas as _pd
+import re as _re
 import read_diag as _rd
 
 def get_convdiag_indices(fname,obtype,code=None,iused=1,endian='big'):
@@ -125,3 +131,209 @@ def get_raddiag_data(fname,indx,qty,endian='big'):
     exec('val = diag.%s[indx]' % qty)
 
     return val
+
+class GSIstat(object):
+    '''
+    Object containing the GSI statistics
+    '''
+
+    def __init__(self,filename,adate):
+        '''
+        Initialize the GSIstat object
+        INPUT:
+            filename = filename of the gsistat file
+            adate = analysis date
+        OUTPUT:
+            GSIstat: object containing the contents of the filename
+        '''
+
+        self.filename = filename
+        self.analysis_date = adate
+
+        fh = open(self.filename,'rb')
+        self._lines = fh.readlines() # Keep lines private
+        fh.close()
+
+        # Initialize cache for fast parsing
+        self._cache = {}
+
+        return
+
+    def extract(self,name):
+        '''
+        From the gsistat file, extract information:
+        INPUT:
+            name = information seeked
+            Valid options are:
+                ps, oz, uv, t, q, gps, rad, cost
+        OUTPUT:
+            df = dataframe containing information
+        '''
+
+        # If name has already been parsed,
+        # just return it from cache
+        if name in self._cache:
+            df = self._cache[name]
+            return df
+
+        if name in ['ps']:
+            df = self._get_ps()
+        elif name in ['oz']:
+            df = self._get_ozone()
+        elif name in ['uv','t','q','gps']:
+            df = self._get_conv(name)
+        elif name in ['rad']:
+            df = self._get_radiance()
+        elif name in ['cost']:
+            df = self._get_cost()
+        else:
+            raise IOError('option %s is not defined' % name)
+
+        if name not in ['oz','cost']:
+            df.reset_index(level='o-g',drop=True,inplace=True)
+
+        if name not in ['oz']:
+            indices = ['DATETIME'] + list(df.index.names)
+            df['DATETIME'] = self.analysis_date
+            df.set_index('DATETIME', append=True, inplace=True)
+            df = df.reorder_levels(indices)
+
+        self._cache[name] = df
+
+        return df
+
+    # Surface pressure Fit
+    def _get_ps(self):
+        '''
+        Search for surface pressure
+        '''
+
+        pattern = 'obs\s+type\s+stype\s+count'
+        for line in self._lines:
+            if _re.search(pattern,line):
+                header = 'o-g ' + line.strip()
+                break
+
+        tmp = []
+        pattern = ' o-g (\d\d) %7s' % ('ps')
+        for line in self._lines:
+            if _re.match(pattern,line):
+                # don't add monitored or rejected data
+                if any(x in line for x in ['mon','rej']):
+                    continue
+                tmp.append(line.strip().split())
+
+        columns = header.split()
+        df = _pd.DataFrame(data=tmp,columns=columns)
+        df.set_index(columns[:5],inplace=True)
+        df = df.astype(_np.float)
+
+        return df
+
+    # Conventional Observation Fits
+    def _get_conv(self,name):
+        '''
+        Search for uv, t, q, or gps
+        '''
+
+        # Get pressure levels
+        for line in self._lines:
+            if 'ptop' in line:
+                ptops = _np.asarray(line.strip().split()[1:],dtype=_np.float)
+            if 'pbot' in line:
+                pbots = _np.asarray(line.strip().split()[5:],dtype=_np.float)
+                header = 'o-g ' + line.strip()
+                header = _re.sub('pbot','stat',header)
+                header = _re.sub('2000.0','column',header)
+                break
+
+        tmp = []
+        pattern = ' o-g (\d\d) %7s' % (name)
+        for line in self._lines:
+            if _re.match(pattern,line):
+                # don't add monitored or rejected data
+                if any(x in line for x in ['mon','rej']):
+                    continue
+                # don't add cpen or qcpen either
+                # careful here, cpen here also removes qcpen
+                # hence the extra space before qcpen and cpen
+                if any(x in line for x in [' qcpen',' cpen']):
+                    continue
+                tmp.append(line.strip().split())
+
+        columns = header.split()
+        df = _pd.DataFrame(data=tmp,columns=columns)
+        df.set_index(columns[:6],inplace=True)
+        df = df.astype(_np.float)
+
+        return df
+
+    # Ozone Fits
+    def _get_ozone(self):
+        '''
+        Search for ozone penalty
+        '''
+
+        tmp = []
+        pattern = 'ozone total'
+        for line in self._lines:
+            if _re.match(pattern,line):
+                # remove qcpenalty
+                if any(x in line for x in ['qcpenalty_all']):
+                    continue
+                tmp.append(line)
+
+        oz = tmp
+        return oz
+
+    # Radiances
+    def _get_radiance(self):
+        '''
+        Search for radiance summary statistics
+        '''
+
+        # Get header
+        pattern = 'it\s+satellite\s+instrument\s+'
+        for line in self._lines:
+            if _re.search(pattern,line):
+                header = _re.sub('#',' ',line)
+                header = 'o-g ' + header.strip()
+                break
+
+        tmp = []
+        pattern = 'o-g (\d\d) %3s' % ('rad')
+        for line in self._lines:
+            if _re.match(pattern,line):
+                # don't add monitored or rejected data
+                if any(x in line for x in ['mon','rej']):
+                    continue
+                line = _re.sub('rad',' ',line)
+                tmp.append(line.strip().split())
+
+        columns = header.split()
+        df = _pd.DataFrame(data=tmp,columns=columns)
+        df.set_index(columns[:4],inplace=True)
+        df = df.astype(_np.float)
+        df = df.swaplevel('satellite','instrument')
+
+        return df
+
+    # Minimization
+    def _get_cost(self):
+        '''
+        Search for minimization and cost function information
+        '''
+
+        tmp = []
+        pattern = 'costterms Jb,Jo,Jc,Jl'
+        for line in self._lines:
+            if _re.match(pattern,line):
+                tmp.append(line.strip().split('=')[-1].split())
+
+        columns = ['Outer','Inner','Jb','Jo','Jc','Jl']
+        df = _pd.DataFrame(data=tmp,columns=columns)
+        df.set_index(columns[:2],inplace=True)
+        df = df.astype(_np.float)
+        df['J'] = df.sum(axis=1)
+
+        return df
