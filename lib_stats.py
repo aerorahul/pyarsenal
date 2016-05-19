@@ -20,7 +20,7 @@ __status__ = "Prototype"
 __all__ = ['mstats', 'lregress', 'ttest', 'get_weights', 'get_weighted_mean']
 
 import numpy as _np
-from scipy.stats import t.ppf as _t.ppf
+from scipy.stats import t as _t
 
 
 def mstats(x):
@@ -130,31 +130,42 @@ def lregress(x, y, tcrit=0.0):
     return [rc, sb, ssig]
 
 
-def ttest(x, y, ci=95.0, paired=True):
+def ttest(x, y=None, ci=95.0, paired=True):
     '''
     Given two samples, perform the Student's t-test and return the errorbar
+    INPUT:
+        x - control
+        y - experiment (default: x)
+       ci - confidence interval (default: 95%)
+   paired - paired t-test (default: True)
+   OUTPUT:
+ diffmean_norm - normalized difference in the sample means
+ errorbar_norm - normalized errorbar with respect to control
     '''
 
-    pval = 1.0 - (1.0 - ci / 100.0) / 2.0
-    tcrit = _t.ppf(pval, 2 * len(y) - 2)
+    if y is None:
+        y = x.copy()
 
-    diffmean = x.mean() - y.mean()
+    pval = 1.0 - (1.0 - ci / 100.0) / 2.0
+    tcrit = _t.ppf(pval, 2 * len(x) - 2)
+
+    diffmean = y.mean() - x.mean()
 
     if (paired):
         # paired t-test
-        std_err = _np.sqrt(_np.var(x - y, ddof=1) / len(y))
+        std_err = _np.sqrt(_np.var(y - x, ddof=1) / len(x))
     else:
         # unpaired t-test
-        std_err = _np.sqrt((x.var(ddof=1) + y.var(ddof=1)) / (len(y) - 1.0))
+        std_err = _np.sqrt((x.var(ddof=1) + y.var(ddof=1)) / (len(x) - 1.0))
 
     errorbar = tcrit * std_err
 
     # normalize (rescale) the diffmean and errorbar
-    scale_fac = 100.0 / y.mean()
+    scale_fac = 100.0 / x.mean()
     diffmean_norm = diffmean * scale_fac
     errorbar_norm = errorbar * scale_fac
 
-    return x.mean(), diffmean_norm, errorbar_norm
+    return diffmean_norm, errorbar_norm
 
 
 def get_weights(lats):

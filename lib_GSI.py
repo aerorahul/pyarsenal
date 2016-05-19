@@ -225,8 +225,9 @@ class GSIstat(object):
 
         columns = header.split()
         df = _pd.DataFrame(data=tmp,columns=columns)
+        df[['it','type','count']] = df[['it','type','count']].astype(_np.int)
+        df[['bias','rms','cpen','qcpen']] = df[['bias','rms','cpen','qcpen']].astype(_np.float)
         df.set_index(columns[:5],inplace=True)
-        df = df.astype(_np.float)
 
         return df
 
@@ -263,6 +264,7 @@ class GSIstat(object):
 
         columns = header.split()
         df = _pd.DataFrame(data=tmp,columns=columns)
+        df[['it','type']] = df[['it','type']].astype(_np.int)
         df.set_index(columns[:6],inplace=True)
         df = df.astype(_np.float)
 
@@ -312,8 +314,9 @@ class GSIstat(object):
 
         columns = header.split()
         df = _pd.DataFrame(data=tmp,columns=columns)
+        df[['it','read','keep','assim']] = df[['it','read','keep','assim']].astype(_np.int)
+        df[['penalty','qcpnlty','cpen','qccpen']] = df[['penalty','qcpnlty','cpen','qccpen']].astype(_np.float)
         df.set_index(columns[:4],inplace=True)
-        df = df.astype(_np.float)
         df = df.swaplevel('satellite','instrument')
 
         return df
@@ -332,6 +335,7 @@ class GSIstat(object):
 
         columns = ['Outer','Inner','Jb','Jo','Jc','Jl']
         df = _pd.DataFrame(data=tmp,columns=columns)
+        df[['Outer','Inner',]] = df[['Outer','Inner']].astype(_np.int)
         df.set_index(columns[:2],inplace=True)
         df = df.astype(_np.float)
         df['J'] = df.sum(axis=1)

@@ -124,3 +124,20 @@ def EmptyDataFrame(columns,names,dtype=None):
     df = _pd.DataFrame(index=indices, columns=columns, dtype=dtype)
 
     return df
+
+def printcolour(text,colour='red'):
+    colours = {
+            'default':'\033[1;m',
+            'gray':'\033[1;30m',
+            'red':'\033[1;31m',
+            'green':'\033[1;32m',
+            'yellow':'\033[1;33m',
+            'blue':'\033[1;34m',
+            'magenta':'\033[1;35m',
+            'cyan':'\033[1;36m',
+            'white':'\033[1;37m',
+            'crimson':'\033[1;38m'
+            }
+    print colours[colour] + text + colours['default']
+    return
+printcolor = printcolour
