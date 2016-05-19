@@ -86,7 +86,7 @@ def mstats(x):
     return
 
 
-def lregress(x, y, tcrit=0.0):
+def lregress(x, y, ci=95.0):
     '''
     lregress : function that computes the linear regression between
                two variables and returns the regression coefficient and statistical significance
@@ -96,7 +96,7 @@ def lregress(x, y, tcrit=0.0):
 
         x - independent variable
         y - dependent variable
-    tcrit - t statistic critical factor [Default: tcrit = 0.0]
+       ci - confidence interval (default: 95%)
        rc - linear regression coefficient
        sb - standard error on the linear regression coefficient
      ssig - statistical significance of the linear regression coefficient
@@ -107,6 +107,9 @@ def lregress(x, y, tcrit=0.0):
         raise ValueError('samples x and y are not of the same size')
     else:
         nsamp = len(x)
+
+    pval = 1.0 - (1.0 - ci / 100.0) / 2.0
+    tcrit = _t.ppf(pval, 2 * len(x) - 2)
 
     covmat = _np.cov(x, y=y, ddof=1)
     cov_xx = covmat[0, 0]
@@ -149,19 +152,22 @@ def ttest(x, y=None, ci=95.0, paired=True):
     pval = 1.0 - (1.0 - ci / 100.0) / 2.0
     tcrit = _t.ppf(pval, 2 * len(x) - 2)
 
-    diffmean = y.mean() - x.mean()
+    xmean = _np.nanmean(x)
+    ymean = _np.nanmean(y)
+
+    diffmean = ymean - xmean
 
     if (paired):
         # paired t-test
-        std_err = _np.sqrt(_np.var(y - x, ddof=1) / len(x))
+        std_err = _np.sqrt(_np.nanvar(y - x, ddof=1) / len(x))
     else:
         # unpaired t-test
-        std_err = _np.sqrt((x.var(ddof=1) + y.var(ddof=1)) / (len(x) - 1.0))
+        std_err = _np.sqrt((_np.nanvar(x,ddof=1) + _np.nanvar(y,ddof=1)) / (len(x) - 1.0))
 
     errorbar = tcrit * std_err
 
     # normalize (rescale) the diffmean and errorbar
-    scale_fac = 100.0 / x.mean()
+    scale_fac = 100.0 / xmean
     diffmean_norm = diffmean * scale_fac
     errorbar_norm = errorbar * scale_fac
 
