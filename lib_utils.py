@@ -63,12 +63,11 @@ def pickle(fname,data,mode='wb'):
     data  - data to pickle
     mode - mode to pickle (default: wb)
     '''
-    print('pickling ... %s' % fname)
+    print 'pickling ... %s' % fname
     try:
         _pickle.dump(data, open(fname, mode))
     except _pickle.PicklingError:
         raise
-    print ' ... done'
     return
 
 
@@ -77,34 +76,31 @@ def unpickle(fname, mode='rb'):
     fname - filename to unpickle to
     mode - mode to unpickle (default: rb)
     '''
-    print('unpickling ... %s' % fname),
+    print 'unpickling ... %s' % fname
     try:
         data = _pickle.load(open(fname, mode))
     except _pickle.UnpicklingError:
         raise
-    print ' ... done'
     return data
 
 
 def writeHDF(fname,vname,data):
-    print('writing ... %s' % fname),
+    print 'writing ... %s' % fname
     try:
         hdf = _pd.HDFStore(fname)
         hdf.put(vname,data,format='table',append=True)
         hdf.close()
     except RuntimeError:
         raise
-    print ' ... done'
     return
 
 
 def readHDF(fname,vname,**kwargs):
-    print('reading ... %s' % fname),
+    print 'reading ... %s' % fname
     try:
         data = _pd.read_hdf(fname,vname,**kwargs)
     except RuntimeError:
         raise
-    print ' ... done'
     return data
 
 

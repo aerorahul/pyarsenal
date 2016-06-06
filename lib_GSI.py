@@ -340,4 +340,14 @@ class GSIstat(object):
         df = df.astype(_np.float)
         df['J'] = df.sum(axis=1)
 
+        tmp = []
+        pattern = 'cost,grad,step,b,step'
+        for line in self._lines:
+            if _re.match(pattern,line):
+                tmp.append(line.strip().split('=')[-1].split()[3])
+
+        s = _pd.Series(data=tmp,index=df.index)
+        s = s.astype(_np.float)
+        df.loc[:,'gJ'] = s
+
         return df

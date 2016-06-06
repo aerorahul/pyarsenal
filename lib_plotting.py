@@ -26,7 +26,7 @@ __all__ = ['rescale_cmap', 'make_cmap_from_RGB', 'get_cmap_NCARG',
 import os as _os
 import numpy as _np
 from matplotlib import cm as _cm
-from matplotlib import pyplot as _pyplot
+from matplotlib import pyplot as _plt
 from matplotlib import colors as _colors
 from matplotlib import ticker as _ticker
 from matplotlib import mlab as _mlab
@@ -136,6 +136,7 @@ def get_Ndistinct_colors(num_colors):
 
 
 def savefigure(
+        fh=None,
         fname='test',
         format=[
             'png',
@@ -146,10 +147,11 @@ def savefigure(
     '''
     Save a figure in png, eps and pdf formats
     '''
-    from matplotlib import pyplot
 
+    if fh is None:
+        fh = _plt
     if 'png' in format:
-        pyplot.savefig(
+        fh.savefig(
             '%s.png' %
             fname,
             format='png',
@@ -157,7 +159,7 @@ def savefigure(
             dpi,
             orientation=orientation)
     if 'eps' in format:
-        pyplot.savefig(
+        fh.savefig(
             '%s.eps' %
             fname,
             format='eps',
@@ -165,7 +167,7 @@ def savefigure(
             dpi,
             orientation=orientation)
     if 'pdf' in format:
-        pyplot.savefig(
+        fh.savefig(
             '%s.pdf' %
             fname,
             format='pdf',
@@ -276,7 +278,7 @@ def plot_zonal_mean(
         plotOpt = {}
 
     # create figure and axes
-    fig = _pyplot.figure()
+    fig = _plt.figure()
     ax1 = fig.add_subplot(111)
     # scale data if requested
     pdata = data * plotOpt.get('scale_factor', 1.0)
