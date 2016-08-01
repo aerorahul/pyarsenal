@@ -17,9 +17,12 @@ __email__ = "rahul.mahajan@nasa.gov"
 __copyright__ = "Copyright 2016, NOAA / NCEP / EMC"
 __license__ = "GPL"
 __status__ = "Prototype"
-__all__ = ['get_akbk','get_pcoord']
+__all__ = ['get_akbk',
+           'get_pcoord',
+           'read_atcf']
 
 import numpy as _np
+import pandas as _pd
 
 def get_akbk():
     '''
@@ -58,6 +61,41 @@ def get_pcoord():
 
     ak,bk = get_akbk()
     pref = 101.3
-    pres = ak[:-1]. + bk[:-1]*pref
+    pres = ak[:-1] + bk[:-1]*pref
 
     return pres * 10.
+
+def read_atcf(filename):
+    '''
+    Read an ATCF file into a dataframe for ease of processing.
+    INPUT:
+        filename = ATCF filename
+        The file contents are specified at:
+        http://www.nrlmry.navy.mil/atcf_web/docs/database/new/abrdeck.html
+    OUTPUT:
+        df = Pandas DataFrame containing the file contents
+    '''
+
+    def _to_number(s):
+        tmp = 0.1 * _np.float(s[:-1])
+        if s[-1] in ['S','W']:
+            v = -1.0 * tmp if s[-1] in ['S'] else 360.0 - tmp
+        else:
+            v = tmp
+        return v
+
+    names = ['BASIN','CY','YYYYMMDDHH','TECHNUM','TECH','TAU','LAT','LON','VMAX','MSLP','TY','RAD','WINDCODE','RAD1','RAD2','RAD3','RAD4','RADP','RRP','MRD']
+    dtypes = {'BASIN':str,'CY':_np.int,'YYYYMMDDHH':str,'TECHNUM':_np.int,'TECH':str,'TAU':_np.int,'LAT':str,'LON':str,'VMAX':_np.float,'MSLP':_np.float,'TY':str,'RAD':_np.float,'WINDCODE':str,'RAD1':_np.float,'RAD2':_np.float,'RAD3':_np.float,'RAD4':_np.float,'RADP':_np.float,'RRP':_np.float,'MRD':_np.float}
+    index_cols = names[0:3] + [names[5]]
+
+    df = _pd.read_csv(filename,skipinitialspace=True,header=None,names=names,dtype=dtypes)
+
+    # convert YYYYMMDDHH into datetime and make it an index
+    df['YYYYMMDDHH'] = _pd.to_datetime(df['YYYYMMDDHH'], format='%Y%m%d%H')
+    df.set_index(index_cols, inplace=True)
+
+    # convert Lat/Lon to floats from hemisphere info
+    df['LAT'] = df['LAT'].apply(lambda f: _to_number(f))
+    df['LON'] = df['LON'].apply(lambda f: _to_number(f))
+
+    return df
