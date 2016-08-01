@@ -17,8 +17,10 @@ __email__ = "rahul.mahajan@nasa.gov"
 __copyright__ = "Copyright 2016, NOAA / NCEP / EMC"
 __license__ = "GPL"
 __status__ = "Prototype"
-__all__ = ['get_convdiag_indices',
+__all__ = ['get_convdiag_list',
+           'get_convdiag_indices',
            'get_convdiag_data',
+           'get_raddiag_list',
            'get_raddiag_indices',
            'get_raddiag_data',
            'GSIstat']
@@ -27,6 +29,65 @@ import numpy as _np
 import pandas as _pd
 import re as _re
 import read_diag as _rd
+
+def _read_diag_conv(fname,endian='big'):
+    '''
+    Helper function to read a conventional diagnostic file
+    '''
+    try:
+        diag = _rd.diag_conv(fname,endian=endian)
+        diag.read_obs()
+    except:
+        raise Exception('Error handling %s' % fname)
+
+    return diag
+
+def _read_diag_rad(fname,endian='big'):
+    '''
+    Helper function to read a radiance diagnostic file
+    '''
+    try:
+        diag = _rd.diag_rad(fname,endian=endian)
+        diag.read_obs()
+    except:
+        raise Exception('Error handling %s' % fname)
+
+    return diag
+
+def _print_diag_info(diag):
+
+    print '%s contains...' % diag.filename
+    print
+    keys = diag.__dict__.keys()
+    print ', '.join(str(x) for x in keys)
+    print
+
+    return
+
+def _get_diag_data(diag,indx,qty):
+    '''
+    Helper function to get data from a diagnostic file.
+    '''
+    exec('ndim = len(diag.%s.shape)' % qty)
+    if ndim == 1:
+        exec('val = diag.%s[indx]' % qty)
+    else:
+        exec('val = diag.%s[:,indx]' % qty)
+    return val
+
+def get_convdiag_list(fname,endian='big'):
+    '''
+    Given the conventional diagnostic file, print contents
+    INPUT:
+        fname  : name of the conventional diagnostic file
+    OUTPUT:
+        None   : contents of diagnostic file to stdout
+    '''
+
+    diag = _read_diag_conv(fname,endian=endian)
+    _print_diag_info(fname,diag)
+
+    return
 
 def get_convdiag_indices(fname,obtype,code=None,iused=1,endian='big'):
     '''
@@ -41,11 +102,7 @@ def get_convdiag_indices(fname,obtype,code=None,iused=1,endian='big'):
         index  : indices of the requested data in the file
     '''
 
-    try:
-        diag = _rd.diag_conv(fname,endian=endian)
-        diag.read_obs()
-    except:
-        raise Exception('Error handling %s' % fname)
+    diag = _read_diag_conv(fname,endian=endian)
 
     indx = diag.obtype == obtype.rjust(3)
     if code is not None:
@@ -66,15 +123,24 @@ def get_convdiag_data(fname,indx,qty,endian='big'):
         data   : requested data
     '''
 
-    try:
-        diag = _rd.diag_conv(fname,endian=endian)
-        diag.read_obs()
-    except:
-        raise Exception('Error handling %s' % fname)
-
-    exec('val = diag.%s[indx]' % qty)
+    diag = _read_diag_conv(fname,endian=endian)
+    val = _get_diag_data(fname,indx,qty)
 
     return val
+
+def get_raddiag_list(fname,endian='big'):
+    '''
+    Given the radiance diagnostic file, print contents
+    INPUT:
+        fname  : name of the radiance diagnostic file
+    OUTPUT:
+        None   : contents of diagnostic file to stdout
+    '''
+
+    diag = _read_diag_rad(fname,endian=endian)
+    _print_diag_info(diag)
+
+    return
 
 def get_raddiag_indices(fname,ichan,iused=1,oberr=1.e9,water=False,land=False,ice=False,snow=False,snowice=False,endian='big'):
     '''
@@ -94,11 +160,7 @@ def get_raddiag_indices(fname,ichan,iused=1,oberr=1.e9,water=False,land=False,ic
         index  : indices of the requested data in the file
     '''
 
-    try:
-        diag = _rd.diag_rad(fname,endian=endian)
-        diag.read_obs()
-    except:
-        raise Exception('Error handling %s' % fname)
+    diag = _read_diag_rad(fname,endian=endian)
 
     indx = _np.logical_and(diag.channel==ichan,diag.used==iused)
     indx = _np.logical_and(indx,diag.oberr<oberr)
@@ -113,22 +175,16 @@ def get_raddiag_indices(fname,ichan,iused=1,oberr=1.e9,water=False,land=False,ic
 def get_raddiag_data(fname,indx,qty,endian='big'):
     '''
     Given indices, get a specific quantity from the radiance diagnostic file.
-    For searching through the quantities, do a dir(diag)
     INPUT:
-        fname  : name of the conventional diagnostic file
+        fname  : name of the radiance diagnostic file
         index  : indices of the requested data in the file
         qty    : quantity to retrieve e.g. 'hx', 'ob', 'oberr', etc ...
     OUTPUT:
         data   : requested data
     '''
 
-    try:
-        diag = _rd.diag_rad(fname,endian=endian)
-        diag.read_obs()
-    except:
-        raise Exception('Error handling %s' % fname)
-
-    exec('val = diag.%s[indx]' % qty)
+    diag = _read_diag_rad(fname,endian=endian)
+    val = _get_diag_data(diag,indx,qty)
 
     return val
 
