@@ -13,7 +13,7 @@ lib_GFS.py contains utility functions for GFS
 '''
 
 __author__ = "Rahul Mahajan"
-__email__ = "rahul.mahajan@nasa.gov"
+__email__ = "rahul.mahajan@noaa.gov"
 __copyright__ = "Copyright 2016, NOAA / NCEP / EMC"
 __license__ = "GPL"
 __status__ = "Prototype"
@@ -71,9 +71,9 @@ def read_atcf(filename):
     INPUT:
         filename = ATCF filename
         The file contents are specified at:
-        http://www.nrlmry.navy.mil/atcf_web/docs/database/new/abrdeck.html
+        http://www.nrlmry.navy.mil/atcf_web/docs/database/new/abdeck.html
     OUTPUT:
-        df = Pandas DataFrame containing the file contents
+        df = DataFrame containing the file contents
     '''
 
     def _to_number(s):
@@ -84,14 +84,19 @@ def read_atcf(filename):
             v = tmp
         return v
 
-    names = ['BASIN','CY','YYYYMMDDHH','TECHNUM','TECH','TAU','LAT','LON','VMAX','MSLP','TY','RAD','WINDCODE','RAD1','RAD2','RAD3','RAD4','RADP','RRP','MRD']
-    dtypes = {'BASIN':str,'CY':_np.int,'YYYYMMDDHH':str,'TECHNUM':_np.int,'TECH':str,'TAU':_np.int,'LAT':str,'LON':str,'VMAX':_np.float,'MSLP':_np.float,'TY':str,'RAD':_np.float,'WINDCODE':str,'RAD1':_np.float,'RAD2':_np.float,'RAD3':_np.float,'RAD4':_np.float,'RADP':_np.float,'RRP':_np.float,'MRD':_np.float}
-    index_cols = names[0:3] + [names[5]]
+    # column names
+    names = ['BASIN','CY','YYYYMMDDHH','TECHNUM','TECH','TAU','LAT','LON','VMAX','MSLP','TY','RAD','WINDCODE','RAD1','RAD2','RAD3','RAD4','POUTER','ROUTER','RMW','GUSTS','EYE','SUBREGION','MAXSEAS','INITIALS','DIR','SPEED','STORMNAME','DEPTH','SEAS','SEASCODE','SEAS1','SEAS2','SEAS3','SEAS4','USERDEFINE1','USERDATA1','USERDEFINE2','USERDATA2','USERDEFINE3','USERDATA3','USERDEFINE4','USERDATA4','USERDEFINE5','USERDATA5']
+
+    # column datatypes
+    dtypes = {'BASIN':str,'CY':_np.int,'YYYYMMDDHH':str,'TECHNUM':_np.float,'TECH':str,'TAU':_np.float,'LAT':str,'LON':str,'VMAX':_np.float,'MSLP':_np.float,'TY':str,'RAD':_np.float,'WINDCODE':str,'RAD1':_np.float,'RAD2':_np.float,'RAD3':_np.float,'RAD4':_np.float,'POUTER':_np.float,'ROUTER':_np.float,'RMW':_np.float,'GUSTS':_np.float,'EYE':_np.float,'SUBREGION':str,'MAXSEAS':_np.float,'INITIALS':str,'DIR':_np.float,'SPEED':_np.float,'STORMNAME':str,'DEPTH':str,'SEAS':_np.float,'SEASCODE':str,'SEAS1':_np.float,'SEAS2':_np.float,'SEAS3':_np.float,'SEAS4':_np.float,'USERDEFINE1':str,'USERDATA1':str,'USERDEFINE2':str,'USERDATA2':str,'USERDEFINE3':str,'USERDATA3':str,'USERDEFINE4':str,'USERDATA4':str,'USERDEFINE5':str,'USERDATA5':str}
 
     df = _pd.read_csv(filename,skipinitialspace=True,header=None,names=names,dtype=dtypes)
 
-    # convert YYYYMMDDHH into datetime and make it an index
+    # convert YYYYMMDDHH into datetime
     df['YYYYMMDDHH'] = _pd.to_datetime(df['YYYYMMDDHH'], format='%Y%m%d%H')
+
+    # set index columns
+    index_cols = names[0:3] + [names[5]]
     df.set_index(index_cols, inplace=True)
 
     # convert Lat/Lon to floats from hemisphere info

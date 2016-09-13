@@ -68,11 +68,14 @@ def _get_diag_data(diag,indx,qty):
     '''
     Helper function to get data from a diagnostic file.
     '''
+    ndim = None
     exec('ndim = len(diag.%s.shape)' % qty)
     if ndim == 1:
         exec('val = diag.%s[indx]' % qty)
-    else:
+    elif ndim > 1:
         exec('val = diag.%s[:,indx]' % qty)
+    else:
+        val = None
     return val
 
 def get_convdiag_list(fname,endian='big'):
@@ -245,16 +248,101 @@ class GSIstat(object):
         else:
             raise IOError('option %s is not defined' % name)
 
-        if name not in ['oz','cost']:
+        # Drop the o-g from the indicies list
+        if 'o-g' in list(df.index.names):
             df.reset_index(level='o-g',drop=True,inplace=True)
 
-        if name not in ['oz']:
-            indices = ['DATETIME'] + list(df.index.names)
-            df['DATETIME'] = self.analysis_date
-            df.set_index('DATETIME', append=True, inplace=True)
-            df = df.reorder_levels(indices)
+        # Add datetime index
+        df = self._add_datetime_index(df)
 
+        # Cache it for faster access
         self._cache[name] = df
+
+        return df
+
+    def _add_datetime_index(self,df):
+        '''
+        Add the datetime as the first index
+        INPUT:
+            df = dataframe without datetime index
+        OUTPUT:
+            df = dataframe with datetime as the 1st index
+        '''
+
+        # If date is already present, return
+        if 'date' in list(df.index.names):
+            return df
+
+        indices = ['date'] + list(df.index.names)
+        df['date'] = self.analysis_date
+        df.set_index('date', append=True, inplace=True)
+        df = df.reorder_levels(indices)
+
+        return df
+
+    def extract_instrument(self,obtype,instrument):
+        '''
+        From the gsistat file, extract detailed information on an instrument:
+        INPUT:
+            obtype     = observation type to extract (rad or oz)
+            instrument = instrument name [must be in the observation type]
+            E.g.:
+                amsua, mhs, iasi, hirs, etc
+        OUTPUT:
+            df = dataframe containing information
+        '''
+
+        # If instrument has already been parsed,
+        # just return it from cache
+        if instrument in self._cache:
+            df = self._cache[instrument]
+            return df
+
+        # Ensure obtype is already called,
+        # if not call it and cache it
+        if obtype in self._cache.keys():
+            otype = self._cache[obtype]
+        else:
+            otype = self.extract(obtype)
+            self._cache[obtype] = otype
+
+        instruments = sorted(otype.index.get_level_values('instrument').unique())
+        satellites  = sorted(otype.index.get_level_values('satellite' ).unique())
+
+        if instrument not in instruments:
+            print 'Instrument %s not found!' % instrument
+            print '%s contains ...' % self.filename
+            print ', '.join(str(x) for x in instruments)
+            return None
+
+        # Handle special instruments
+        if instrument in ['iasi','iasi616']:
+            inst = 'iasi616'
+        elif instrument in ['airs','airs281SUBSET']:
+            inst = 'airs281SUBSET'
+        else:
+            inst = instrument
+
+        tmp = []
+        pattern = '\s+\d+\s+\d+\s+%s_\S+\s+\d+\s+\d+\s+' % (inst)
+        for line in self._lines:
+            if _re.match(pattern,line):
+                tst = line.strip().split()
+                tst = tst[:2] + tst[2].split('_') + tst[3:]
+                tmp.append(tst)
+
+        columns = ['it','channel','instrument','satellite','nassim','nrej','oberr','OmF_bc','OmF_wobc','col1','col2','col3']
+        df = _pd.DataFrame(data=tmp,columns=columns)
+        df.drop(['col1','col2','col3'],inplace=True,axis=1)
+        df[['channel','nassim','nrej']] = df[['channel','nassim','nrej']].astype(_np.int)
+        df[['oberr','OmF_bc','OmF_wobc']] = df[['oberr','OmF_bc','OmF_wobc']].astype(_np.float)
+        lendf = len(df)
+        df['it'] = 1
+        its,ite = 0, lendf/3;        df['it'][its:ite] = 1
+        its,ite = lendf/3,2*lendf/3; df['it'][its:ite] = 2
+        its,ite = 2*lendf/3,-1;      df['it'][its:ite] = 3
+        df = df[['it','instrument','satellite','channel','nassim','nrej','oberr','OmF_bc','OmF_wobc']]
+        df.set_index(['it','instrument','satellite','channel'],inplace=True)
 
         return df
 
@@ -329,20 +417,36 @@ class GSIstat(object):
     # Ozone Fits
     def _get_ozone(self):
         '''
-        Search for ozone penalty
+        Search for ozone summary statistics
         '''
 
+        # Get header
+        pattern = 'it\s+sat\s+inst\s+'
+        for line in self._lines:
+            if _re.search(pattern,line):
+                header = _re.sub('#',' ',line)
+                header = 'o-g ' + header.strip()
+                break
+
         tmp = []
-        pattern = 'ozone total'
+        pattern = 'o-g (\d\d) %2s' % ('oz')
         for line in self._lines:
             if _re.match(pattern,line):
-                # remove qcpenalty
-                if any(x in line for x in ['qcpenalty_all']):
+                # don't add monitored or rejected data
+                if any(x in line for x in ['mon','rej']):
                     continue
-                tmp.append(line)
+                line = _re.sub('oz',' ',line)
+                tmp.append(line.strip().split())
 
-        oz = tmp
-        return oz
+        columns = header.split()
+        df = _pd.DataFrame(data=tmp,columns=columns)
+        df[['it','read','keep','assim']] = df[['it','read','keep','assim']].astype(_np.int)
+        df[['penalty','cpen','qcpen','qcfail']] = df[['penalty','cpen','qcpen','qcfail']].astype(_np.float)
+        df.set_index(columns[:4],inplace=True)
+        df = df.swaplevel('sat','inst')
+        df.index.rename(['satellite','instrument'],level=['sat','inst'],inplace=True)
+
+        return df
 
     # Radiances
     def _get_radiance(self):
@@ -407,3 +511,83 @@ class GSIstat(object):
         df.loc[:,'gJ'] = s
 
         return df
+
+
+def kt_def():
+    '''
+    These values of kt are taken from GMAO.
+    Some may be consistent with NCEP, others need careful examination
+    Use at your own risk!
+    '''
+    kt = {
+        4   : ['u', 'Upper-air zonal wind', 'm/sec'],
+        5   : ['v', 'Upper-air meridional wind','m/sec'],
+        11  : ['q', 'Upper-air specific humidity','g/kg'],
+        12  : ['w10', 'Surface (10m) wind speed','m/sec'],
+        17  : ['rr', 'Rain Rate','mm/hr'],
+        18  : ['tpw', 'Total Precipitable Water',''],
+        21  : ['col_o3', 'Total column ozone','DU'],
+        22  : ['lyr_o3', 'Layer ozone','DU'],
+        33  : ['ps', 'Surface (2m) pressure','hPa'],
+        39  : ['sst', 'Sea-surface temperature','K'],
+        40  : ['Tb', 'Brightness temperature','K'],
+        44  : ['Tv', 'Upper-air virtual temperature','K'],
+        89  : ['ba', 'Bending Angle','N'],
+        101 : ['zt', 'Sub-surface temperature','C'],
+        102 : ['zs', 'Sub-surface salinity',''],
+        103 : ['ssh', 'Sea-surface height anomaly','m'],
+        104 : ['zu', 'Sub-surface zonal velocity','m/s'],
+        105 : ['zv', 'Sub-surface meridional velocity','m/s'],
+        106 : ['ss', 'Synthetic Salinity','']
+    }
+    return kt
+
+def kx_def():
+    '''
+    These values of kx are taken from GMAO.
+    Some may be consistent with NCEP, others need careful examination
+    Use at your own risk!
+    '''
+    kx = {}
+    for key in [120,220]:
+        kx[key] = 'Radiosonde'
+    for key in [221,229]:
+        kx[key] = 'PIBAL'
+    for key in [132,182,232]:
+        kx[key] = 'Dropsonde'
+    for key in [130,230]:
+        kx[key] = 'AIREP'
+    for key in [131,231]:
+        kx[key] = 'ASDAR'
+    for key in [133,233]:
+        kx[key] = 'MDCARS'
+    for key in [180,280]:
+        kx[key] = 'Ship'
+    for key in [282]:
+        kx[key] = 'Moored_Buoy'
+    for key in [181]:
+        kx[key] = 'Land_Surface'
+    for key in [187]:
+        kx[key] = 'METAR'
+    for key in [199,299]:
+        kx[key] = 'Drifting_Buoy'
+    for key in [223]:
+        kx[key] = 'Profiler_Wind'
+    for key in [224]:
+        kx[key] = 'NEXRAD_Wind'
+    for key in [242,243,245,246,250,252,253]:
+        kx[key] = 'Geo_Wind'
+    for key in [244]:
+        kx[key] = 'AVHRR_Wind'
+    for key in [257,258,259]:
+        kx[key] = 'MODIS_Wind'
+    for key in [285]:
+        kx[key] = 'RAPIDSCAT_Wind'
+    for key in [290]:
+        kx[key] = 'ASCAT_Wind'
+    for key in [3,4,42,43,722,740,741,743,744,745]:
+        kx[key] = 'GPSRO'
+    for key in [112,210]:
+        kx[key] = 'TCBogus'
+
+    return kx
