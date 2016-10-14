@@ -84,10 +84,10 @@ def unpickle(fname, mode='rb'):
     return data
 
 
-def writeHDF(fname,vname,data):
+def writeHDF(fname,vname,data,complevel=0,complib=None,fletcher32=False):
     print 'writing ... %s' % fname
     try:
-        hdf = _pd.HDFStore(fname)
+        hdf = _pd.HDFStore(fname,complevel=complevel,complib=complib,fletcher32=fletcher32)
         hdf.put(vname,data,format='table',append=True)
         hdf.close()
     except RuntimeError:
