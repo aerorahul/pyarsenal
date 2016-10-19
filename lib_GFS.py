@@ -88,7 +88,7 @@ def read_atcf(filename):
     names = ['BASIN','CY','YYYYMMDDHH','TECHNUM','TECH','TAU','LAT','LON','VMAX','MSLP','TY','RAD','WINDCODE','RAD1','RAD2','RAD3','RAD4','POUTER','ROUTER','RMW','GUSTS','EYE','SUBREGION','MAXSEAS','INITIALS','DIR','SPEED','STORMNAME','DEPTH','SEAS','SEASCODE','SEAS1','SEAS2','SEAS3','SEAS4','USERDEFINE1','USERDATA1','USERDEFINE2','USERDATA2','USERDEFINE3','USERDATA3','USERDEFINE4','USERDATA4','USERDEFINE5','USERDATA5']
 
     # column datatypes
-    dtypes = {'BASIN':str,'CY':_np.int,'YYYYMMDDHH':str,'TECHNUM':_np.float,'TECH':str,'TAU':_np.float,'LAT':str,'LON':str,'VMAX':_np.float,'MSLP':_np.float,'TY':str,'RAD':_np.float,'WINDCODE':str,'RAD1':_np.float,'RAD2':_np.float,'RAD3':_np.float,'RAD4':_np.float,'POUTER':_np.float,'ROUTER':_np.float,'RMW':_np.float,'GUSTS':_np.float,'EYE':_np.float,'SUBREGION':str,'MAXSEAS':_np.float,'INITIALS':str,'DIR':_np.float,'SPEED':_np.float,'STORMNAME':str,'DEPTH':str,'SEAS':_np.float,'SEASCODE':str,'SEAS1':_np.float,'SEAS2':_np.float,'SEAS3':_np.float,'SEAS4':_np.float,'USERDEFINE1':str,'USERDATA1':str,'USERDEFINE2':str,'USERDATA2':str,'USERDEFINE3':str,'USERDATA3':str,'USERDEFINE4':str,'USERDATA4':str,'USERDEFINE5':str,'USERDATA5':str}
+    dtypes = {'BASIN':str,'CY':str,'YYYYMMDDHH':str,'TECHNUM':_np.float,'TECH':str,'TAU':_np.float,'LAT':str,'LON':str,'VMAX':_np.float,'MSLP':_np.float,'TY':str,'RAD':_np.float,'WINDCODE':str,'RAD1':_np.float,'RAD2':_np.float,'RAD3':_np.float,'RAD4':_np.float,'POUTER':_np.float,'ROUTER':_np.float,'RMW':_np.float,'GUSTS':_np.float,'EYE':_np.float,'SUBREGION':str,'MAXSEAS':_np.float,'INITIALS':str,'DIR':_np.float,'SPEED':_np.float,'STORMNAME':str,'DEPTH':str,'SEAS':_np.float,'SEASCODE':str,'SEAS1':_np.float,'SEAS2':_np.float,'SEAS3':_np.float,'SEAS4':_np.float,'USERDEFINE1':str,'USERDATA1':str,'USERDEFINE2':str,'USERDATA2':str,'USERDEFINE3':str,'USERDATA3':str,'USERDEFINE4':str,'USERDATA4':str,'USERDEFINE5':str,'USERDATA5':str}
 
     df = _pd.read_csv(filename,skipinitialspace=True,header=None,names=names,dtype=dtypes)
 
@@ -96,8 +96,11 @@ def read_atcf(filename):
     df['YYYYMMDDHH'] = _pd.to_datetime(df['YYYYMMDDHH'], format='%Y%m%d%H')
 
     # set index columns
-    index_cols = names[0:3] + [names[5]]
+    index_cols = ['BASIN','CY','YYYYMMDDHH','TECHNUM','TECH','TAU','TY','SUBREGION']
     df.set_index(index_cols, inplace=True)
+
+    # drop columns that have no information
+    df.dropna(axis=1,how='all',inplace=True)
 
     # convert Lat/Lon to floats from hemisphere info
     df['LAT'] = df['LAT'].apply(lambda f: _to_number(f))
