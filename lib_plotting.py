@@ -29,7 +29,7 @@ from matplotlib import cm as _cm
 from matplotlib import pyplot as _plt
 from matplotlib import colors as _colors
 from matplotlib import ticker as _ticker
-from matplotlib import mlab as _mlab
+from scipy.interpolate import griddata as _griddata
 
 def rescale_cmap(cntrs, cmap='jet'):
     '''
@@ -205,7 +205,7 @@ def get_plev_bounds(plevs, plevbotbound=1013.25, plevtopbound=175.0):
     return [levbot, levtop]
 
 
-def tripolar_to_latlon(in_lon, in_lat, in_var):
+def tripolar_to_latlon(in_lon, in_lat, in_var, nlon=360, nlat=200):
     '''
     Interpolate a variable on tripolar grid (such as MOM5) to LatLon grid
     '''
@@ -227,20 +227,60 @@ def tripolar_to_latlon(in_lon, in_lat, in_var):
     lat_1d = _np.ravel(lat_roll)
 
     # Create a lat-lon uniform grid
-    out_lon = _np.linspace(0.0, 360.0, 360.0, endpoint=False)
-    out_lat = _np.linspace(-90.0, 90.0, 200)
+    out_lon = _np.linspace(0.0, 360.0, nlon, endpoint=False)
+    out_lat = _np.linspace(-90.0, 90.0, nlat)
     out_lon, out_lat = _np.meshgrid(out_lon, out_lat)
 
     # Interpolate from tri-polar to lat-lon grid and get rid of the ridiculous
     # values
-    out_var = _mlab.griddata(
-        lon_1d,
-        lat_1d,
+    out_var = _griddata(
+        (lon_1d,lat_1d),
         var_1d,
-        out_lon,
-        out_lat,
-        interp='nn')
+        (out_lon,out_lat),
+        method='nearest')
     out_var = _np.ma.masked_where(out_var > 1.1 * in_var.max(), out_var)
+
+    return out_lon, out_lat, out_var
+
+
+def cube_to_latlon(lon_in, lat_in, var_in, nlon=360, nlat=181):
+    '''
+    Interpolate a variable on cube-sphere grid (such as FV3) to LatLon grid
+    '''
+
+    nf, nx, ny = var_in.shape
+
+    # Shrink the n faces 2D data into 1D data
+    lon_1d = _np.reshape(lon_in, (nf*nx*ny,))
+    lat_1d = _np.reshape(lat_in, (nf*nx*ny,))
+    var_1d = _np.reshape(var_in, (nf*nx*ny,))
+
+    # Create a lat-lon uniform grid
+    out_lon = _np.linspace(0.0, 360.0, nlon, endpoint=False)
+    out_lat = _np.linspace(-90.0, 90.0, nlat)
+    out_lon, out_lat = _np.meshgrid(out_lon, out_lat)
+
+    # Interpolate from cube to lat-lon grid
+    out_var = _griddata(
+        (lon_1d,lat_1d),
+        var_1d,
+        (out_lon,out_lat),
+        method='linear')
+
+    lon_1d = _np.reshape(out_lon, (nlon*nlat,))
+    lat_1d = _np.reshape(out_lat, (nlon*nlat,))
+    var_1d = _np.reshape(out_var, (nlon*nlat,))
+
+    lat_1d = lat_1d[~_np.isnan(var_1d)]
+    lon_1d = lon_1d[~_np.isnan(var_1d)]
+    var_1d = var_1d[~_np.isnan(var_1d)]
+
+    # Fill in extrapolated values with nearest neighbor
+    out_var = _griddata(
+        (lon_1d,lat_1d),
+        var_1d,
+        (out_lon,out_lat),
+        method='nearest')
 
     return out_lon, out_lat, out_var
 
