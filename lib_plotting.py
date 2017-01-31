@@ -135,6 +135,23 @@ def get_Ndistinct_colors(num_colors):
     return colors
 
 
+def discrete_colors(N, base_cmap=None, colormap=False):
+    """Create an N-bin discrete colors or colormap from the specified input map"""
+
+    from matplotlib.colors import LinearSegmentedColormap as _lscmap
+
+    # Note that if base_cmap is a string or None, you can simply do
+    #    return plt.cm.get_cmap(base_cmap, N)
+    # The following works for string, None, or a colormap instance:
+
+    base = _plt.cm.get_cmap(base_cmap)
+    color_list = base(_np.linspace(0, 1, N))
+    cmap_name = base.name + str(N)
+
+    #return base.from_list(cmap_name, color_list, N)
+    return _lscmap.from_list(cmap_name, color_list, N) if colormap else color_list
+
+
 def savefigure(
         fh=None,
         fname='test',
@@ -411,6 +428,7 @@ def plot_zonal_mean(
 
     return fig
 
+
 class TaylorDiagram(object):
     """Taylor diagram: plot model standard deviation and correlation
     to reference (data) sample in a polar plot, with
@@ -419,7 +437,7 @@ class TaylorDiagram(object):
     https://gist.github.com/ycopin/3342888
     """
 
-    def __init__(self, refstd, fig=None, rect=111, label='_', norm=False, full=False):
+    def __init__(self, refstd, fig=None, rect=111, label='_', norm=False, full=False, grid=True):
         """Set up Taylor diagram axes, i.e. polar plot,
         using mpl_toolkits.axisartist.floating_axes. refstd is
         the reference standard deviation to be compared to.
@@ -434,6 +452,7 @@ class TaylorDiagram(object):
         self.refstd = refstd            # Reference standard deviation
         self.norm   = norm              # Normalized or Absolute
         self.full   = full              # Full or Single-quadrant Taylor
+        self.grid   = grid              # Cyan grid-lines at correlation theta
 
         tr = _PolarAxes.PolarTransform()
 
@@ -480,9 +499,13 @@ class TaylorDiagram(object):
         ax.axis["top"].major_ticklabels.set_axis_direction("top")
         ax.axis["top"].label.set_axis_direction("top")
         ax.axis["top"].label.set_text("Correlation")
+        ax.axis["top"].label.set_fontsize(12)
+        ax.axis["top"].label.set_fontweight("normal")
 
         ax.axis["left"].set_axis_direction("bottom") # "X axis"
         ax.axis["left"].label.set_text("Normalized Standard Deviation" if self.norm else "Standard Deviation")
+        ax.axis["left"].label.set_fontsize(12)
+        ax.axis["left"].label.set_fontweight("normal")
 
         ax.axis["right"].set_axis_direction("top")   # "Y axis"
         ax.axis["right"].toggle(ticklabels=True)
@@ -502,7 +525,7 @@ class TaylorDiagram(object):
         self.ax = ax.get_aux_axes(tr)   # Polar coordinates
 
         # Add reference point and stddev contour
-        print "Reference std:", self.refstd
+        #print "Reference std:", self.refstd
         l, = self.ax.plot([0], 1.0 if self.norm else self.refstd, 'k*',
                           ls='', ms=10, label=label)
         t = _np.linspace(0, self.ext_max)
@@ -518,6 +541,18 @@ class TaylorDiagram(object):
             t = _np.zeros_like(r) + _np.pi/2.
             self.ax.plot(t,r,'k--',label='_')
 
+        # Add cyan radii at all correlations:
+        if self.grid:
+            r = _np.linspace(0.,self.smax)
+            for th in tlocs:
+                th_deg = 180.*th/_np.pi
+                if not (20. < th_deg < 160. and th_deg != 90.): continue
+                t = _np.zeros_like(r) + th
+                self.ax.plot(t,r,'c-',label='_')
+
+        return
+
+
     def add_sample(self, stddev, corrcoef, *args, **kwargs):
         """Add sample (stddev,corrcoeff) to the Taylor diagram. args
         and kwargs are directly propagated to the Figure.plot
@@ -528,6 +563,7 @@ class TaylorDiagram(object):
         self.samplePoints.append(l)
 
         return l
+
 
     def add_contours(self, levels=5, **kwargs):
         """Add constant centered RMS difference contours."""
