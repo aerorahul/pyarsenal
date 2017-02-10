@@ -260,7 +260,7 @@ def tripolar_to_latlon(in_lon, in_lat, in_var, nlon=360, nlat=200):
     return out_lon, out_lat, out_var
 
 
-def cube_to_latlon(lon_in, lat_in, var_in, nlon=360, nlat=181):
+def cube_to_latlon(lon_in, lat_in, var_in, nlon=360, nlat=181,method='linear'):
     '''
     Interpolate a variable on cube-sphere grid (such as FV3) to LatLon grid
     '''
@@ -282,7 +282,7 @@ def cube_to_latlon(lon_in, lat_in, var_in, nlon=360, nlat=181):
         (lon_1d,lat_1d),
         var_1d,
         (out_lon,out_lat),
-        method='linear')
+        method=method)
 
     lon_1d = _np.reshape(out_lon, (nlon*nlat,))
     lat_1d = _np.reshape(out_lat, (nlon*nlat,))
@@ -302,10 +302,40 @@ def cube_to_latlon(lon_in, lat_in, var_in, nlon=360, nlat=181):
     return out_lon, out_lat, out_var
 
 
+def irregular_to_latlon(lon_1d, lat_1d, var_1d, nlon=360, nlat=181,method='linear'):
+    '''
+    Interpolate a variable on irregular grid to a LatLon grid
+    '''
+
+    # Create a lat-lon uniform grid
+    out_lon = _np.linspace(0.0, 360.0, nlon, endpoint=False)
+    out_lat = _np.linspace(-90.0, 90.0, nlat)
+    out_lon, out_lat = _np.meshgrid(out_lon, out_lat)
+
+    # Interpolate from cube to lat-lon grid
+    out_var = _griddata(
+        (lon_1d,lat_1d),
+        var_1d,
+        (out_lon,out_lat),
+        method=method)
+
+    lon_1d = _np.reshape(out_lon, (nlon*nlat,))
+    lat_1d = _np.reshape(out_lat, (nlon*nlat,))
+    var_1d = _np.reshape(out_var, (nlon*nlat,))
+
+    lat_1d = lat_1d[~_np.isnan(var_1d)]
+    lon_1d = lon_1d[~_np.isnan(var_1d)]
+    var_1d = var_1d[~_np.isnan(var_1d)]
+
+    return out_lon, out_lat, out_var
+
+
 def plot_zonal_mean(
         x,
         y,
         data,
+        data_hatch=None,
+        fig=None,
         plotOpt=None,
         modelLevels=None,
         surfacePressure=None):
@@ -335,18 +365,23 @@ def plot_zonal_mean(
         plotOpt = {}
 
     # create figure and axes
-    fig = _plt.figure()
+    if fig == None:
+        fig = _plt.figure()
+#    _plt.clf()
     ax1 = fig.add_subplot(111)
     # scale data if requested
     pdata = data * plotOpt.get('scale_factor', 1.0)
+    if plotOpt.get('hatch',False):
+        if data_hatch == None:
+            plotOpt['hatch'] = False
+        else:
+            pdata_hatch = data_hatch * plotOpt.get('scale_factor', 1.0)
     # determine contour levels to be used; default: linear spacing, 21 levels
     clevs = plotOpt.get('levels', _np.linspace(data.min(), data.max(), 21))
     # map contour values to colors
-    norm = _colors.BoundaryNorm(
-        clevs, ncolors=plotOpt.get(
-            'ncolors', 20), clip=False)
+    cmap = plotOpt.get('cmap','jet')
     # draw the (filled) contours
-    contour = ax1.contourf(x, y, pdata, levels=clevs, norm=norm)
+    contour = ax1.contourf(x, y, pdata, cmap=cmap, levels=clevs)
     if plotOpt.get('zero_contour', False):
         ax1.contour(
             x,
@@ -355,6 +390,12 @@ def plot_zonal_mean(
             colors='k',
             linewidths=2.0,
             levels=[0.0])
+    if plotOpt.get('hatch', False):
+        cf2 = ax1.contourf(x, y, pdata_hatch,
+            colors='none',
+            levels=clevs,
+            hatches='x',
+            color=0.2)
     # mask out surface pressure if given
     if not surfacePressure is None:
         ax1.fill_between(

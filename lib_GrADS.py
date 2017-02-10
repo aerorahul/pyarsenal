@@ -57,42 +57,88 @@ class grads_session(object):
 
         return self.ga.expr('%s' % var)
 
-    def read_gridded_data(self,
-                          var='T',
-                          lons=[-180.0,
-                                180.0],
-                          lats=[-90.0,
-                                90.0],
-                          time=None,
-                          z=[1],
-                          lev=None):
+    def read_gridded_data(self, var=None,
+            x=None, y=None, z=None, t=None,
+            lon=None, lat=None, lev=None, time=None,
+            GaField=True):
         '''
-        Read gridded data; default T at 00Z01Jan2000 on z=1 surface
+        Set dimension limits and then read gridded data
+        default time used 00Z01Jan2000
+        Returns a GAField by default, unless only data is requested
+        via GaField=False
         '''
+
+        if var == None:
+            print 'Need to specify as variable'
+            raise
+
+        if x != None and lon != None:
+            print 'Cannot specify both x and lon concurrently, chose one'
+            raise
+
+        if y != None and lat != None:
+            print 'Cannot specify both y and lat concurrently, chose one'
+            raise
+
+        if z != None and lev != None:
+            print 'Cannot specify both z and lev concurrently, chose one'
+            raise
 
         self.ga('set dfile %d' % self.fh.fid)
 
-        if (len(lons) == 1):
-            self.ga('set lon %f' % (lons[0]))
+        if x != None:
+            if len(x) == 1:
+                self.ga('set x %d' % (x[0]))
+            else:
+                self.ga('set x %d %d' % (x[0], x[1]))
+        elif lon != None:
+            if len(lon) == 1:
+                self.ga('set lon %f' % (lon[0]))
+            else:
+                self.ga('set lon %f %f' % (lon[0], lon[1]))
         else:
-            self.ga('set lon %f %f' % (lons[0], lons[1]))
+            print 'WARNING! both x and lon are None'
 
-        if (len(lats) == 1):
-            self.ga('set lat %f' % (lats[0]))
+        if y != None:
+            if len(y) == 1:
+                self.ga('set y %d' % (y[0]))
+            else:
+                self.ga('set y %d %d' % (y[0], y[1]))
+        elif lat != None:
+            if len(lat) == 1:
+                self.ga('set lat %f' % (lat[0]))
+            else:
+                self.ga('set lat %f %f' % (lat[0], lat[1]))
         else:
-            self.ga('set lat %f %f' % (lats[0], lats[1]))
+            print 'WARNING! both y and lat are None'
 
-        if (len(z) == 1):
-            self.ga('set z %f' % (z[0]))
+        if z != None:
+            if len(z) == 1:
+                self.ga('set z %d' % (z[0]))
+            else:
+                self.ga('set z %d %d' % (z[0], z[1]))
+        elif lev != None:
+            if len(lev) == 1:
+                self.ga('set lev %f' % (lev[0]))
+            else:
+                self.ga('set lev %d %d' % (lev[0], lev[1]))
         else:
-            self.ga('set z %d %d' % (z[0], z[1]))
+            print 'WARNING! both z and lev are None'
 
-        if (lev is not None):
-            self.ga('set lev %f' % lev)
-
-        if (time is not None):
-            self.ga('set time %s' % time)
+        if t != None:
+            if len(t) == 1:
+                self.ga('set t %d' % (t[0]))
+            else:
+                self.ga('set t %d %d' % (t[0], t[1]))
+        elif time != None:
+            if len(time) == 1:
+                self.ga('set time %d' % (t[0]))
+            else:
+                self.ga('set time %d %d' % (t[0], t[1]))
         else:
-            self.ga('set time 00Z01Jan2000')
+            if x != None:
+                self.ga('set t 00Z01Jan2000')
+            elif lon != None:
+                self.ga('set time 00Z01Jan2000')
 
-        return self.ga.expr('%s' % var)
+        return self.ga.expr('%s' % var) if GaField else self.ga.expr('%s' % var).data

@@ -133,45 +133,53 @@ def lregress(x, y, ci=95.0):
     return [rc, sb, ssig]
 
 
-def ttest(x, y=None, ci=95.0, paired=True):
+def ttest(x, y=None, ci=95.0, paired=True, scale=False):
     '''
     Given two samples, perform the Student's t-test and return the errorbar
+    The test assumes the sample size be the same between x and y.
     INPUT:
         x - control
         y - experiment (default: x)
        ci - confidence interval (default: 95%)
    paired - paired t-test (default: True)
+    scale - normalize with mean(x) and return as a percentage (default: False)
    OUTPUT:
- diffmean_norm - normalized difference in the sample means
- errorbar_norm - normalized errorbar with respect to control
+ diffmean - (normalized) difference in the sample means
+ errorbar - (normalized) errorbar with respect to control
+
+    To mask out statistically significant values
+    diffmask = numpy.ma.masked_where(numpy.abs(diffmean)<=errorbar,diffmean).mask
     '''
 
-    if y is None:
+    nsamp = x.shape[0]
+
+    if y == None:
         y = x.copy()
 
     pval = 1.0 - (1.0 - ci / 100.0) / 2.0
-    tcrit = _t.ppf(pval, 2 * len(x) - 2)
+    tcrit = _t.ppf(pval, 2*(nsamp-1))
 
-    xmean = _np.nanmean(x)
-    ymean = _np.nanmean(y)
+    xmean = _np.nanmean(x,axis=0)
+    ymean = _np.nanmean(y,axis=0)
 
     diffmean = ymean - xmean
 
-    if (paired):
+    if paired:
         # paired t-test
-        std_err = _np.sqrt(_np.nanvar(y - x, ddof=1) / len(x))
+        std_err = _np.sqrt(_np.nanvar(y-x,axis=0,ddof=1) / nsamp)
     else:
         # unpaired t-test
-        std_err = _np.sqrt((_np.nanvar(x,ddof=1) + _np.nanvar(y,ddof=1)) / (len(x) - 1.0))
+        std_err = _np.sqrt((_np.nanvar(x,axis=0,ddof=1) + _np.nanvar(y,axis=0,ddof=1)) / (nsamp-1.))
 
     errorbar = tcrit * std_err
 
     # normalize (rescale) the diffmean and errorbar
-    scale_fac = 100.0 / xmean
-    diffmean_norm = diffmean * scale_fac
-    errorbar_norm = errorbar * scale_fac
+    if scale:
+        scale_fac = 100.0 / xmean
+        diffmean = diffmean * scale_fac
+        errorbar = errorbar * scale_fac
 
-    return diffmean_norm, errorbar_norm
+    return diffmean, errorbar
 
 
 def get_weights(lats):
