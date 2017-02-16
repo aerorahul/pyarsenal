@@ -92,14 +92,14 @@ def get_convdiag_list(fname,endian='big'):
 
     return
 
-def get_convdiag_indices(fname,obtype,code=None,iused=1,endian='big'):
+def get_convdiag_indices(fname,obtype,code=None,used=None,endian='big'):
     '''
     Given parameters, get the indicies of observation locations from a conventional diagnostic file
     INPUT:
         fname  : name of the conventional diagnostic file
         obtype : observation type e.g. 'ps', 'u', 'v', 't' etc
         code   : KX (default: None)
-        iused  : qc flag (default: 1)
+        used   : qc flag (default: None) e.g. 0, 1
         endian : filetype (default: 'big')
     OUTPUT:
         index  : indices of the requested data in the file
@@ -108,9 +108,8 @@ def get_convdiag_indices(fname,obtype,code=None,iused=1,endian='big'):
     diag = _read_diag_conv(fname,endian=endian)
 
     indx = diag.obtype == obtype.rjust(3)
-    if code is not None:
-        indx = _np.logical_and(indx,diag.code==code)
-    indx = _np.logical_and(indx,diag.used==iused)
+    if code != None: indx = _np.logical_and(indx,diag.code==code)
+    if used != None: indx = _np.logical_and(indx,diag.used==used)
 
     return indx
 
@@ -127,7 +126,7 @@ def get_convdiag_data(fname,indx,qty,endian='big'):
     '''
 
     diag = _read_diag_conv(fname,endian=endian)
-    val = _get_diag_data(fname,indx,qty)
+    val = _get_diag_data(diag,indx,qty)
 
     return val
 
@@ -145,14 +144,14 @@ def get_raddiag_list(fname,endian='big'):
 
     return
 
-def get_raddiag_indices(fname,ichan,iused=1,oberr=1.e9,water=False,land=False,ice=False,snow=False,snowice=False,endian='big'):
+def get_raddiag_indices(fname,ichan,used=None,oberr=None,water=False,land=False,ice=False,snow=False,snowice=False,endian='big'):
     '''
     Given parameters, get the indicies of observation locations from a radiance diagnostic file
     INPUT:
         fname  : name of the conventional diagnostic file
         ichan  : channel number
-        iused  : qc flag (default: 1)
-        oberr  : filter through observation error (default: 1.e9)
+        used   : qc flag (default: None) e.g. 0, 1
+        oberr  : filter through observation error (default: None) e.g. 1.e9
         water  : filter observations over water (default: False)
         land   : filter observations over land (default: False)
         ice    : filter observations over ice (default: False)
@@ -165,13 +164,14 @@ def get_raddiag_indices(fname,ichan,iused=1,oberr=1.e9,water=False,land=False,ic
 
     diag = _read_diag_rad(fname,endian=endian)
 
-    indx = _np.logical_and(diag.channel==ichan,diag.used==iused)
-    indx = _np.logical_and(indx,diag.oberr<oberr)
-    if ( water   ): indx = _np.logical_and(indx,diag.water_frac<0.99)
-    if ( land    ): indx = _np.logical_and(indx,diag.land_frac<0.01)
-    if ( ice     ): indx = _np.logical_and(indx,diag.ice_frac<0.99)
-    if ( snow    ): indx = _np.logical_and(indx,diag.snow_frac<0.99)
-    if ( snowice ): indx = _np.logical_and(indx,diag.snow_frac+diag.ice_frac<0.99)
+    indx = diag.channel == ichan
+    if used  != None: indx = _np.logical_and(indx,diag.used==used)
+    if oberr != None: indx = _np.logical_and(indx,diag.oberr<oberr)
+    if water:         indx = _np.logical_and(indx,diag.water_frac<0.99)
+    if land:          indx = _np.logical_and(indx,diag.land_frac<0.01)
+    if ice:           indx = _np.logical_and(indx,diag.ice_frac<0.99)
+    if snow:          indx = _np.logical_and(indx,diag.snow_frac<0.99)
+    if snowice:       indx = _np.logical_and(indx,diag.snow_frac+diag.ice_frac<0.99)
 
     return indx
 
@@ -336,11 +336,18 @@ class GSIstat(object):
         df.drop(['col1','col2','col3'],inplace=True,axis=1)
         df[['channel','nassim','nrej']] = df[['channel','nassim','nrej']].astype(_np.int)
         df[['oberr','OmF_bc','OmF_wobc']] = df[['oberr','OmF_bc','OmF_wobc']].astype(_np.float)
+
+        # Since iteration number is not readily available, make one
         lendf = len(df)
-        df['it'] = 1
-        its,ite = 0, lendf/3;        df['it'][its:ite] = 1
-        its,ite = lendf/3,2*lendf/3; df['it'][its:ite] = 2
-        its,ite = 2*lendf/3,-1;      df['it'][its:ite] = 3
+        nouter = lendf / len(df['it'].unique())
+        douter = lendf / nouter
+        it = _np.zeros(lendf,dtype=int)
+        for i in range(nouter):
+            its = douter * i
+            ite = douter * (i+1)
+            it[its:ite] = i+1
+        df['it'] = it
+
         df = df[['it','instrument','satellite','channel','nassim','nrej','oberr','OmF_bc','OmF_wobc']]
         df.set_index(['it','instrument','satellite','channel'],inplace=True)
 

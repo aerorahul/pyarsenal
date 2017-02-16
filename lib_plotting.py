@@ -381,21 +381,18 @@ def plot_zonal_mean(
     # map contour values to colors
     cmap = plotOpt.get('cmap','jet')
     # draw the (filled) contours
-    contour = ax1.contourf(x, y, pdata, cmap=cmap, levels=clevs)
+    contour = ax1.contourf(x, y, pdata,
+            cmap=cmap,
+            levels=clevs)
     if plotOpt.get('zero_contour', False):
-        ax1.contour(
-            x,
-            y,
-            pdata,
+        cf1 = ax1.contour(x, y, pdata,
             colors='k',
             linewidths=2.0,
             levels=[0.0])
     if plotOpt.get('hatch', False):
         cf2 = ax1.contourf(x, y, pdata_hatch,
             colors='none',
-            levels=clevs,
-            hatches='x',
-            color=0.2)
+            hatches=['.'])
     # mask out surface pressure if given
     if not surfacePressure is None:
         ax1.fill_between(
