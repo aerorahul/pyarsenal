@@ -614,3 +614,38 @@ class TaylorDiagram(object):
         contours = self.ax.contour(ts, rs, rms, levels, **kwargs)
 
         return contours
+
+
+def irregular_to_latlon(lon_1d, lat_1d, var_1d, nlon=360, nlat=181):
+    '''
+    Interpolate a variable on cube-sphere grid (such as FV3) to LatLon grid
+    '''
+
+    # Create a lat-lon uniform grid
+    out_lon = _np.linspace(0.0, 360.0, nlon, endpoint=False)
+    out_lat = _np.linspace(-90.0, 90.0, nlat)
+    out_lon, out_lat = _np.meshgrid(out_lon, out_lat)
+
+    # Interpolate from cube to lat-lon grid
+    out_var = _griddata(
+        (lon_1d,lat_1d),
+        var_1d,
+        (out_lon,out_lat),
+        method='linear')
+
+    lon_1d = _np.reshape(out_lon, (nlon*nlat,))
+    lat_1d = _np.reshape(out_lat, (nlon*nlat,))
+    var_1d = _np.reshape(out_var, (nlon*nlat,))
+
+    lat_1d = lat_1d[~_np.isnan(var_1d)]
+    lon_1d = lon_1d[~_np.isnan(var_1d)]
+    var_1d = var_1d[~_np.isnan(var_1d)]
+
+    # Fill in extrapolated values with nearest neighbor
+    out_var = _griddata(
+        (lon_1d,lat_1d),
+        var_1d,
+        (out_lon,out_lat),
+        method='nearest')
+
+    return out_lon, out_lat, out_var

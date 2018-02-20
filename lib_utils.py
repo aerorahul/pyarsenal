@@ -1,16 +1,12 @@
 #!/usr/bin/env python
 
-###############################################################
-# < next few lines under version control, D O  N O T  E D I T >
-# $Date$
-# $Revision$
-# $Author$
-# $Id$
-###############################################################
-
 '''
 lib_utils.py contains handy utility functions
 '''
+
+import numpy as _np
+import cPickle as _pickle
+import pandas as _pd
 
 __author__ = "Rahul Mahajan"
 __email__ = "rahul.mahajan@nasa.gov"
@@ -18,16 +14,12 @@ __copyright__ = "Copyright 2016, NOAA / NCEP / EMC"
 __license__ = "GPL"
 __status__ = "Prototype"
 __all__ = [
-            'float10Power','roundNumber',
-            'pickle','unpickle',
-            'writeHDF','readHDF',
+            'float10Power', 'roundNumber',
+            'pickle', 'unpickle',
+            'writeHDF', 'readHDF',
             'EmptyDataFrame'
           ]
 
-
-import numpy as _np
-import cPickle as _pickle
-import pandas as _pd
 
 def float10Power(value):
     if value == 0:
@@ -57,7 +49,7 @@ def roundNumber(value):
     return round_value
 
 
-def pickle(fname,data,mode='wb'):
+def pickle(fname, data, mode='wb'):
     '''
     fname - filename to pickle to
     data  - data to pickle
@@ -84,27 +76,29 @@ def unpickle(fname, mode='rb'):
     return data
 
 
-def writeHDF(fname,vname,data,complevel=0,complib=None,fletcher32=False):
+def writeHDF(fname, vname, data, complevel=0, complib=None, fletcher32=False):
     print 'writing ... %s' % fname
     try:
-        hdf = _pd.HDFStore(fname,complevel=complevel,complib=complib,fletcher32=fletcher32)
-        hdf.put(vname,data,format='table',append=True)
+        hdf = _pd.HDFStore(fname,
+                           complevel=complevel, complib=complib,
+                           fletcher32=fletcher32)
+        hdf.put(vname, data, format='table', append=True)
         hdf.close()
     except RuntimeError:
         raise
     return
 
 
-def readHDF(fname,vname,**kwargs):
+def readHDF(fname, vname, **kwargs):
     print 'reading ... %s' % fname
     try:
-        data = _pd.read_hdf(fname,vname,**kwargs)
+        data = _pd.read_hdf(fname, vname, **kwargs)
     except RuntimeError:
         raise
     return data
 
 
-def EmptyDataFrame(columns,names,dtype=None):
+def EmptyDataFrame(columns, names, dtype=None):
     '''
         Create an empty Multi-index DataFrame
         Input:
@@ -116,23 +110,28 @@ def EmptyDataFrame(columns,names,dtype=None):
 
     levels = [[] for i in range(len(names))]
     labels = [[] for i in range(len(names))]
-    indices = _pd.MultiIndex(levels=levels,labels=labels,names=names)
+    indices = _pd.MultiIndex(levels=levels, labels=labels, names=names)
     df = _pd.DataFrame(index=indices, columns=columns, dtype=dtype)
 
     return df
 
-def printcolour(text,colour='red'):
+
+def printcolour(text, colour='red'):
+    '''
+        Print the stdout in color
+    '''
+
     colours = {
-            'default':'\033[1;m',
-            'gray':'\033[1;30m',
-            'red':'\033[1;31m',
-            'green':'\033[1;32m',
-            'yellow':'\033[1;33m',
-            'blue':'\033[1;34m',
-            'magenta':'\033[1;35m',
-            'cyan':'\033[1;36m',
-            'white':'\033[1;37m',
-            'crimson':'\033[1;38m'
+            'default': '\033[1;m',
+            'gray': '\033[1;30m',
+            'red': '\033[1;31m',
+            'green': '\033[1;32m',
+            'yellow': '\033[1;33m',
+            'blue': '\033[1;34m',
+            'magenta': '\033[1;35m',
+            'cyan': '\033[1;36m',
+            'white': '\033[1;37m',
+            'crimson': '\033[1;38m'
             }
     print colours[colour] + text + colours['default']
     return

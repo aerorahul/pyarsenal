@@ -189,12 +189,12 @@ def get_weights(lats):
     return _np.cos((_np.pi / 180.0) * lats)
 
 
-def get_weighted_mean(data, wght, axis=0):
+def get_weighted_mean(data, weights, axis=None):
     '''
     Given the weights for latitudes, computed weighted mean of data in that direction
     Note, data and wght must be same dimension
+    Uses numpy.average
     '''
-    if (data.shape != wght.shape):
-        raise ValueError('data and weights mis-match array size')
+    assert data.shape == weights.shape, ('data and weights mis-match array size')
 
-    return (wght * data).mean(axis=axis) / wght.mean(axis=axis)
+    return _np.average(data, weights=weights, axis=axis)
