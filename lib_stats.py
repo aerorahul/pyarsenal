@@ -1,22 +1,9 @@
 #!/usr/bin/env python
 
-###############################################################
-# < next few lines under version control, D O  N O T  E D I T >
-# $Date$
-# $Revision$
-# $Author$
-# $Id$
-###############################################################
-
 '''
 lib_stats.py contains statistics utility functions
 '''
 
-__author__ = "Rahul Mahajan"
-__email__ = "rahul.mahajan@nasa.gov"
-__copyright__ = "Copyright 2016, NOAA / NCEP / EMC"
-__license__ = "GPL"
-__status__ = "Prototype"
 __all__ = ['mstats', 'lregress', 'ttest', 'get_weights', 'get_weighted_mean']
 
 import numpy as _np

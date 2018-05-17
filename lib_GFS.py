@@ -1,22 +1,9 @@
 #!/usr/bin/env python
 
-###############################################################
-# < next few lines under version control, D O  N O T  E D I T >
-# $Date$
-# $Revision$
-# $Author$
-# $Id$
-###############################################################
-
 '''
 lib_GFS.py contains utility functions for GFS
 '''
 
-__author__ = "Rahul Mahajan"
-__email__ = "rahul.mahajan@noaa.gov"
-__copyright__ = "Copyright 2016, NOAA / NCEP / EMC"
-__license__ = "GPL"
-__status__ = "Prototype"
 __all__ = ['get_akbk',
            'get_pcoord',
            'read_atcf']

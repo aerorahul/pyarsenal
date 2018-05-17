@@ -1,11 +1,4 @@
 #!/usr/bin/env python
-###############################################################
-# < next few lines under version control, D O  N O T  E D I T >
-# $Date$
-# $Revision$
-# $Author$
-# $Id$
-###############################################################
 
 '''
 lib_GrADS.py contains an interface to PyGrADS object GrADS
@@ -14,12 +7,6 @@ It makes reading a binary grads and ctl file easy
 
 from grads import GrADS as _GrADS
 
-__author__ = "Rahul Mahajan"
-__email__ = "rahul.mahajan@nasa.gov"
-__copyright__ = "Copyright 2016, NOAA / NCEP / EMC"
-__license__ = "GPL"
-__status__ = "Prototype"
-__version__ = "0.1"
 __all__ = ['grads_session']
 
 

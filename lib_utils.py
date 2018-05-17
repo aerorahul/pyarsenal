@@ -8,11 +8,6 @@ import numpy as _np
 import cPickle as _pickle
 import pandas as _pd
 
-__author__ = "Rahul Mahajan"
-__email__ = "rahul.mahajan@nasa.gov"
-__copyright__ = "Copyright 2016, NOAA / NCEP / EMC"
-__license__ = "GPL"
-__status__ = "Prototype"
 __all__ = [
             'float10Power', 'roundNumber',
             'pickle', 'unpickle',

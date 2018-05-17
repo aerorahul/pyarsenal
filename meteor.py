@@ -1,26 +1,11 @@
 #!/usr/bin/env python
 
-###############################################################
-# < next few lines under version control, D O  N O T  E D I T >
-# $Date$
-# $Revision$
-# $Author$
-# $Id$
-###############################################################
-
 '''
 meteor.py contains commonly used meteorological related functions
 At some point, one should start using Unidata MetPy module instead
 '''
 
 import numpy as _np
-
-__author__ = "Rahul Mahajan"
-__email__ = "rahul.mahajan@nasa.gov"
-__copyright__ = "Copyright 2016, NOAA / NCEP / EMC"
-__license__ = "GPL"
-__status__ = "Prototype"
-__version__ = "0.1"
 
 __all__ = ['atmos_const', 'meteor']
 

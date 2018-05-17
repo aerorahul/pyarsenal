@@ -1,23 +1,8 @@
 #!/usr/bin/env python
 
-###############################################################
-# < next few lines under version control, D O  N O T  E D I T >
-# $Date$
-# $Revision$
-# $Author$
-# $Id$
-###############################################################
-
 '''
 mapping.py contains mapping related functions:
 '''
-
-__author__ = "Rahul Mahajan"
-__email__ = "rahul.mahajan@noaa.gov"
-__copyright__ = "Copyright 2016, NOAA / NCEP / EMC"
-__license__ = "GPL"
-__status__ = "Prototype"
-__version__ = "0.1"
 
 __all__ = ['Projection', 'createMap', 'drawMap']
 

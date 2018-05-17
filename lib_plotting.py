@@ -1,23 +1,9 @@
 #!/usr/bin/env python
 
-###############################################################
-# < next few lines under version control, D O  N O T  E D I T >
-# $Date$
-# $Revision$
-# $Author$
-# $Id$
-###############################################################
-
 '''
-plotting.py contains plotting related functions
+lib_plotting.py contains plotting related functions
 '''
 
-__author__ = "Rahul Mahajan"
-__email__ = "rahul.mahajan@noaa.gov"
-__copyright__ = "Copyright 2016, NOAA / NCEP / EMC"
-__license__ = "GPL"
-__status__ = "Prototype"
-__version__ = "0.1"
 __all__ = ['rescale_cmap', 'make_cmap_from_RGB', 'get_cmap_NCARG',
            'savefigure',
            'get_region_bounds', 'get_plev_bounds', 'tripolar_to_latlon',

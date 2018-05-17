@@ -1,24 +1,10 @@
 #!/usr/bin/env python
-###############################################################
-# < next few lines under version control, D O  N O T  E D I T >
-# $Date$
-# $Revision$
-# $Author$
-# $Id$
-###############################################################
 
 '''
 lib_specs.py contains region and variable specifications
 '''
 
 import numpy as _np
-
-__author__ = "Rahul Mahajan"
-__email__ = "rahul.mahajan@nasa.gov"
-__copyright__ = "Copyright 2016, NOAA / NCEP / EMC"
-__license__ = "GPL"
-__status__ = "Prototype"
-__version__ = "0.1"
 
 __all__ = ['region_specs', 'var_specs', 'field_specs']
 

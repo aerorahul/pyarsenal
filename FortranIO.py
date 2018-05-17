@@ -1,13 +1,5 @@
 #!/usr/bin/env python
 
-###############################################################
-# < next few lines under version control, D O  N O T  E D I T >
-# $Date$
-# $Revision$
-# $Author$
-# $Id$
-###############################################################
-
 """
 A tool for reading files that sue the Fortran "unformatted" format.
 The class FortranIO.FortranIO is a subclass of file with additional methods to read such files into numpy arrays.
@@ -32,12 +24,12 @@ class SentinelError(IOError):
 
 class FortranIO(file):
 	"""
-	A subclass of the buitin file type, with additional methods to read and write numpy 
+	A subclass of the buitin file type, with additional methods to read and write numpy
 	arrays from/to files in the Fortran "unformatted" format.
-	
+
 	The format does not seem to be standardized, but always seems to consist of a sentinel indicating the
 	size in bytes of the following field, then the data, then the data, and then the same sentinel.
-	
+
 	For newer versions of gfortran (4.2 and later) and intel fortran, the sentinel is a 32-bit integer.
 
 	If a read of an array fails the file is returned to where it started before the read, and an error raised.
@@ -50,7 +42,7 @@ class FortranIO(file):
 		name : the filename
 		mode : the read/write mode ("r","w","rw", etc.)
 		buffering : 0 for unbuffered, 1 for line buffers, >1 for buffer size
-		
+
 		endian : '=' for native (default)
 				 '!' for non-native
 				 '>' for big-endian
@@ -60,11 +52,11 @@ class FortranIO(file):
 				 transferring files between machines then you can always leave this as the default.
 		sentinel : This specifies the data type of the sentinel used in the unformatted file.
 					  The default is correct at least for gfortran versions >= 4.2 and ifort, and probably lots of others.
-			
+
 		Returns
 		-------
 		None
-				
+
 		Raises
 		------
 		ValueError : If an endianness other than '=','!','>','<' is specified
@@ -83,18 +75,18 @@ class FortranIO(file):
 			}[endian] [np.little_endian]
 		except KeyError:
 			raise ValueError("Endianness must be in [=,<,>,!], not %s" % endian)
-		
+
 	def _readSentinel(self):
 		"""
 		Internal method to red the fortran sentinel bytes that surround a record.
 		Parameters
 		----------
 		None
-		
+
 		Returns
 		_______
 		l : integer, of type self.sentinel
-		
+
 		Raises
 		------
 		SentinelError
@@ -113,11 +105,11 @@ class FortranIO(file):
 		Parameters
 		----------
 		x : int, the sentinel to compare
-		
+
 		Returns
 		-------
 		None
-		
+
 		Raises
 		------
 		IOError
@@ -134,16 +126,16 @@ class FortranIO(file):
 		Parameters
 		----------
 		None
-		
+
 		Returns
 		-------
 		s : string, read from file.
-		
+
 		Raises
 		------
 		IOError : If unable to read array from file or file is not of correct fortran format.
 				  If this is raised the file position returns to its position before calling this function.
-		
+
 		"""
 		pos=self.tell()
 		try:
@@ -160,15 +152,15 @@ class FortranIO(file):
 		Parameters
 		----------
 		s : String to be written to file
-		
+
 		Returns
 		-------
 		None
-		
+
 		Raises
 		------
 		IOError : If unable to write to file.
-		
+
 		"""
 		sentinel = np.array([len(s)],dtype=self.sentinel)
 		if self.swap:
@@ -182,16 +174,16 @@ class FortranIO(file):
 		"""
 		Read a number of numpy arrays from a fortran file.
 		If any of the reads fail the file pointer remains where it started.
-		
+
 		Parameters
 		----------
 		dtypes : The numpy data types of the arrays to be read.
 		shapes : (optional) shapes to reshape the read arrays into
-		
+
 		Returns
 		-------
-		[arrays] : list of arrays of data types [dtypes] read from the file, possibly reshaped 
-		
+		[arrays] : list of arrays of data types [dtypes] read from the file, possibly reshaped
+
 		Raises
 		------
 		IOError : If unable to read from file.
@@ -232,11 +224,11 @@ class FortranIO(file):
 		Parameters
 		----------
 		n : optional, number of fields to advance (default = 1)
-		
+
 		Returns
 		-------
 		None
-		
+
 		Raises
 		------
 		IOError : If unable to advance in file or fortran format not correct.
@@ -250,22 +242,22 @@ class FortranIO(file):
 		except IOError, e:
 			self.seek(pos)
 			raise e
-			
+
 
 	def readArray(self,dtype,shape=None):
 		"""
 		Read a numpy array from a fortran file.
 		If the read fails the file pointer remains where it started
-		
+
 		Parameters
 		----------
 		dtype : type, The numpy data type of the array to be read.
 		shape : (optional) shape to reshape the read array into
-		
+
 		Returns
 		-------
 		data : ndarray, of data type dtype, read from the file, possibly reshaped
-		
+
 		Raises
 		------
 		IOError : If unable to read from file.
@@ -275,7 +267,7 @@ class FortranIO(file):
 		try:
 			nb=self._readSentinel()
 			n = nb//np.nbytes[dtype]
-			
+
 			if n*np.nbytes[dtype]!=nb:
 				raise IOError("Fortran array format not correct")
 			data=np.fromfile(self,dtype,n)

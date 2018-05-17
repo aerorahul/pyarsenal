@@ -1,22 +1,9 @@
 #!/usr/bin/env python
 
-###############################################################
-# < next few lines under version control, D O  N O T  E D I T >
-# $Date$
-# $Revision$
-# $Author$
-# $Id$
-###############################################################
-
 '''
-netCDF.py contains utility functions for netCDF files
+lib_netCDF.py contains utility functions for netCDF files
 '''
 
-__author__ = "Rahul Mahajan"
-__email__ = "rahul.mahajan@nasa.gov"
-__copyright__ = "Copyright 2011, NASA / GSFC / GMAO"
-__license__ = "GPL"
-__status__ = "Prototype"
 __all__ = ['variable_exist', 'read_netCDF_var']
 
 import numpy as _np
