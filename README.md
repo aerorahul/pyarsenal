@@ -1,2 +1,2 @@
-# python_lib
-Library of useful python utilities
+# python-utils
+Collection of useful python utilities
