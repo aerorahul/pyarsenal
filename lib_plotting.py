@@ -6,8 +6,10 @@ lib_plotting.py contains plotting related functions
 
 __all__ = ['rescale_cmap', 'make_cmap_from_RGB', 'get_cmap_NCARG',
            'savefigure',
-           'get_region_bounds', 'get_plev_bounds', 'tripolar_to_latlon',
-           'plot_zonal_mean','TaylorDiagram']
+           'get_region_bounds', 'get_plev_bounds',
+           'tripolar_to_latlon', 'cube_to_latlon',
+           'irregular_to_latlon', 'latlon_to_latlon',
+           'plot_zonal_mean', 'TaylorDiagram']
 
 import os as _os
 import numpy as _np
@@ -312,6 +314,48 @@ def irregular_to_latlon(lon_1d, lat_1d, var_1d, nlon=360, nlat=181,method='linea
     lat_1d = lat_1d[~_np.isnan(var_1d)]
     lon_1d = lon_1d[~_np.isnan(var_1d)]
     var_1d = var_1d[~_np.isnan(var_1d)]
+
+    return out_lon, out_lat, out_var
+
+
+def latlon_to_latlon(lon_in, lat_in, var_in, nlon=360, nlat=181,method='linear'):
+    '''
+    Interpolate a variable on one LatLon grid to another LatLon grid
+    '''
+
+    nx, ny = var_in.shape
+
+    # Shrink the 2D data into 1D data
+    lon_1d = _np.reshape(lon_in, (nx*ny,))
+    lat_1d = _np.reshape(lat_in, (nx*ny,))
+    var_1d = _np.reshape(var_in, (nx*ny,))
+
+    # Create the desired lat-lon uniform grid
+    out_lon = _np.linspace(0.0, 360.0, nlon, endpoint=False)
+    out_lat = _np.linspace(-90.0, 90.0, nlat)
+    out_lon, out_lat = _np.meshgrid(out_lon, out_lat)
+
+    # Interpolate from input lat-lon to desired lat-lon grid
+    out_var = _griddata(
+        (lon_1d, lat_1d),
+        var_1d,
+        (out_lon, out_lat),
+        method=method)
+
+    lon_1d = _np.reshape(out_lon, (nlon*nlat,))
+    lat_1d = _np.reshape(out_lat, (nlon*nlat,))
+    var_1d = _np.reshape(out_var, (nlon*nlat,))
+
+    lat_1d = lat_1d[~_np.isnan(var_1d)]
+    lon_1d = lon_1d[~_np.isnan(var_1d)]
+    var_1d = var_1d[~_np.isnan(var_1d)]
+
+    # Fill in extrapolated values with nearest neighbor
+    out_var = _griddata(
+        (lon_1d, lat_1d),
+        var_1d,
+        (out_lon, out_lat),
+        method='nearest')
 
     return out_lon, out_lat, out_var
 
