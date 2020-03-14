@@ -1,2 +1,2 @@
-# python-utils
-Collection of useful python utilities
+# pyarsenal
+Arsenal of useful python tools
