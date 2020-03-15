@@ -121,7 +121,7 @@ class GSIstat(object):
 
         # Ensure obtype is already called,
         # if not call it and cache it
-        if obtype in self._cache.keys():
+        if obtype in list(self._cache.keys()):
             otype = self._cache[obtype]
         else:
             otype = self.extract(obtype)
@@ -131,9 +131,9 @@ class GSIstat(object):
         satellites  = sorted(otype.index.get_level_values('satellite' ).unique())
 
         if instrument not in instruments:
-            print 'Instrument %s not found!' % instrument
-            print '%s contains ...' % self.filename
-            print ', '.join(str(x) for x in instruments)
+            print('Instrument %s not found!' % instrument)
+            print('%s contains ...' % self.filename)
+            print(', '.join(str(x) for x in instruments))
             return None
 
         # Handle special instruments

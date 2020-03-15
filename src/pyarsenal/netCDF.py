@@ -22,7 +22,7 @@ def variable_exist(fname, vname, debug=False):
     except IOError:
         raise IOError('Unable to open %s' % fname)
 
-    if (vname in nc.variables.keys()):
+    if (vname in list(nc.variables.keys())):
         result = True
 
     try:

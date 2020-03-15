@@ -5,7 +5,7 @@ GrADS.py contains an interface to PyGrADS object GrADS
 It makes reading a binary grads and ctl file easy
 '''
 
-from grads import GrADS as _GrADS
+from .grads import GrADS as _GrADS
 
 __all__ = ['grads_session']
 
@@ -56,19 +56,19 @@ class grads_session(object):
         '''
 
         if var == None:
-            print 'Need to specify as variable'
+            print('Need to specify as variable')
             raise
 
         if x != None and lon != None:
-            print 'Cannot specify both x and lon concurrently, chose one'
+            print('Cannot specify both x and lon concurrently, chose one')
             raise
 
         if y != None and lat != None:
-            print 'Cannot specify both y and lat concurrently, chose one'
+            print('Cannot specify both y and lat concurrently, chose one')
             raise
 
         if z != None and lev != None:
-            print 'Cannot specify both z and lev concurrently, chose one'
+            print('Cannot specify both z and lev concurrently, chose one')
             raise
 
         self.ga('set dfile %d' % self.fh.fid)
@@ -84,7 +84,7 @@ class grads_session(object):
             else:
                 self.ga('set lon %f %f' % (lon[0], lon[1]))
         else:
-            print 'WARNING! both x and lon are None'
+            print('WARNING! both x and lon are None')
 
         if y != None:
             if len(y) == 1:
@@ -97,7 +97,7 @@ class grads_session(object):
             else:
                 self.ga('set lat %f %f' % (lat[0], lat[1]))
         else:
-            print 'WARNING! both y and lat are None'
+            print('WARNING! both y and lat are None')
 
         if z != None:
             if len(z) == 1:
@@ -110,7 +110,7 @@ class grads_session(object):
             else:
                 self.ga('set lev %d %d' % (lev[0], lev[1]))
         else:
-            print 'WARNING! both z and lev are None'
+            print('WARNING! both z and lev are None')
 
         if t != None:
             if len(t) == 1:

@@ -44,31 +44,31 @@ def mstats(x):
     OUT.FracZero = len(xf[xf == 0.0]) / OUT.NAnalyzedElements
     OUT.FracNan = OUT.Nnans / OUT.NElements
 
-    print '================= m s t a t s =================='
-    print '        MatrixSize: %s' % (str(OUT.MatrixSize))
-    print '         NElements: %d' % (OUT.NElements)
-    print ' NAnalyzedElements: %d' % (OUT.NAnalyzedElements)
+    print('================= m s t a t s ==================')
+    print('        MatrixSize: %s' % (str(OUT.MatrixSize)))
+    print('         NElements: %d' % (OUT.NElements))
+    print(' NAnalyzedElements: %d' % (OUT.NAnalyzedElements))
     if datatype in ['int', 'int8', 'int16', 'int32', 'int64',
                     'uint8', 'uint16', 'uint32', 'uint64',
                     'float', 'float16', 'float32', 'float64']:
-        print '              Mean: %f' % (OUT.Mean)
-        print '               Max: %f' % (OUT.Max)
-        print '               Min: %f' % (OUT.Min)
-        print '            Median: %f' % (OUT.Median)
-        print '             StDev: %f' % (OUT.StDev)
-        print '           MeanAbs: %f' % (OUT.MeanAbs)
-        print '            MinAbs: %f' % (OUT.MinAbs)
+        print('              Mean: %f' % (OUT.Mean))
+        print('               Max: %f' % (OUT.Max))
+        print('               Min: %f' % (OUT.Min))
+        print('            Median: %f' % (OUT.Median))
+        print('             StDev: %f' % (OUT.StDev))
+        print('           MeanAbs: %f' % (OUT.MeanAbs))
+        print('            MinAbs: %f' % (OUT.MinAbs))
     if datatype in ['complex', 'complex64', 'complex128']:
-        print '              Mean: %f + %fi' % (OUT.Mean.real, OUT.Mean.imag)
-        print '               Max: %f + %fi' % (OUT.Max.real, OUT.Max.imag)
-        print '               Min: %f + %fi' % (OUT.Min.real, OUT.Min.imag)
-        print '            Median: %f + %fi' % (OUT.Median.real, OUT.Median.imag)
-        print '             StDev: %f + %fi' % (OUT.StDev.real, OUT.StDev.imag)
-        print '           MeanAbs: %f + %fi' % (OUT.MeanAbs.real, OUT.MeanAbs.imag)
-        print '            MinAbs: %f + %fi' % (OUT.MinAbs.real, OUT.MinAbs.imag)
-    print '          FracZero: %f' % (OUT.FracZero)
-    print '           FracNaN: %f' % (OUT.FracNan)
-    print '================================================'
+        print('              Mean: %f + %fi' % (OUT.Mean.real, OUT.Mean.imag))
+        print('               Max: %f + %fi' % (OUT.Max.real, OUT.Max.imag))
+        print('               Min: %f + %fi' % (OUT.Min.real, OUT.Min.imag))
+        print('            Median: %f + %fi' % (OUT.Median.real, OUT.Median.imag))
+        print('             StDev: %f + %fi' % (OUT.StDev.real, OUT.StDev.imag))
+        print('           MeanAbs: %f + %fi' % (OUT.MeanAbs.real, OUT.MeanAbs.imag))
+        print('            MinAbs: %f + %fi' % (OUT.MinAbs.real, OUT.MinAbs.imag))
+    print('          FracZero: %f' % (OUT.FracZero))
+    print('           FracNaN: %f' % (OUT.FracNan))
+    print('================================================')
 
     return
 

@@ -99,7 +99,7 @@ def get_cmap_NCARG(name='MPL_jet', lut=None):
         tmplines.append(line.split()[0:3])
 
     if (len(tmplines) != ncolors):
-        print 'error occurred parsing %s' % filename
+        print('error occurred parsing %s' % filename)
         raise
     lines = tmplines
 
@@ -203,7 +203,7 @@ def get_plev_bounds(plevs, plevbotbound=1013.25, plevtopbound=175.0):
     Given pressure levels and bounding levels, return indices of the boundaries
     '''
     if (len(plevs) == 0):
-        print 'plevs is empty, cannot compute plev bounds'
+        print('plevs is empty, cannot compute plev bounds')
         raise
     levbot = plevs.tolist().index(min(plevs, key=lambda l: abs(l - plevbotbound)))
     levtop = plevs.tolist().index(min(plevs, key=lambda l: abs(l - plevtopbound)))
@@ -530,7 +530,7 @@ class TaylorDiagram(object):
             rlocs = _np.concatenate([-1.*_np.flipud(rlocs)[:-1],rlocs])
         tlocs = _np.arccos(rlocs)        # Conversion to polar angles
         gl1 = _GF.FixedLocator(tlocs)    # Positions
-        tf1 = _GF.DictFormatter(dict(zip(tlocs, map(str,rlocs))))
+        tf1 = _GF.DictFormatter(dict(list(zip(tlocs, list(map(str,rlocs))))))
 
         # Standard deviation axis extent and labels
         self.smin = 0
@@ -538,7 +538,7 @@ class TaylorDiagram(object):
             self.smax = 1.5
             slocs = _np.arange(self.smax*10)[::2]/10.
             gl2 = _GF.FixedLocator(slocs)
-            tf2 = _GF.DictFormatter(dict(zip(slocs, map(str,slocs))))
+            tf2 = _GF.DictFormatter(dict(list(zip(slocs, list(map(str,slocs))))))
         else:
             self.smax = 1.5*self.refstd
             gl2 = None

@@ -43,11 +43,11 @@ class Projection(object):
         plabel_int = int(plabel_int)
 
         if self.projection == 'stere':
-            print '%s projection has been implemented but not supported yet' % (self.projection)
+            print('%s projection has been implemented but not supported yet' % (self.projection))
 
         elif (self.projection in ['npstere', 'spstere']):
-            self.meridians = range(-180, 180, mlabel_int)
-            self.parallels = range(-90, 90, plabel_int)
+            self.meridians = list(range(-180, 180, mlabel_int))
+            self.parallels = list(range(-90, 90, plabel_int))
             self.lon_0 = 0.0 if (cenlon is None) else cenlon
             self.meridians_labels = [0, 0, 1, 1] if (
                 meridians_labels is None) else meridians_labels
@@ -67,8 +67,8 @@ class Projection(object):
             self.llcrnrlat = -90.0 if (llcrnrlat is None) else llcrnrlat
             self.urcrnrlon = 360.0 if (urcrnrlon is None) else urcrnrlon
             self.urcrnrlat = 90.0 if (urcrnrlat is None) else urcrnrlat
-            self.meridians = range(-180, 180, mlabel_int)
-            self.parallels = range(-90, 90, plabel_int)
+            self.meridians = list(range(-180, 180, mlabel_int))
+            self.parallels = list(range(-90, 90, plabel_int))
             self.meridians_labels = [0, 0, 0, 1] if (
                 meridians_labels is None) else meridians_labels
             self.parallels_labels = [1, 0, 0, 0] if (
@@ -81,25 +81,25 @@ class Projection(object):
             self.stdlat2 = 0.0 if (stdlat2 is None) else stdlat2
             self.width = 8.0 if (width is None) else width
             self.height = 11.0 if (height is None) else height
-            self.meridians = range(-180, 180, mlabel_int)
-            self.parallels = range(-90, 90, plabel_int)
+            self.meridians = list(range(-180, 180, mlabel_int))
+            self.parallels = list(range(-90, 90, plabel_int))
             self.meridians_labels = [0, 0, 0, 1] if (
                 meridians_labels is None) else meridians_labels
             self.parallels_labels = [0, 1, 0, 0] if (
                 parallels_labels is None) else parallels_labels
 
         elif self.projection == 'ortho':
-            print 'projection "%s" has been implemented but not supported yet' % (self.projection)
+            print('projection "%s" has been implemented but not supported yet' % (self.projection))
 
         elif self.projection == 'robin':
-            print 'projection "%s" has been implemented but not supported yet' % (self.projection)
+            print('projection "%s" has been implemented but not supported yet' % (self.projection))
 
         else:
             msg = 'Error message from : setProj(projection)\n' + \
                   '   projection %s has not been implemented yet\n' % (self.projection) + \
                   '   valid options for projection are:\n' + \
                   '   "stere" | "npstere" | "spstere" | "mill" | "merc" | "lcc" | "ortho" | "robin"'
-            print msg
+            print(msg)
             raise
 
         return
@@ -157,7 +157,7 @@ def createMap(proj, **kwargs):
               '   projection %s has not been implemented yet\n' % (proj.projection) + \
               '   valid options for projection are:\n' + \
               '   "stere" | "npstere" | "spstere" | "mill" | "merc" | "lcc" | "ortho" | "robin"'
-        print msg
+        print(msg)
         raise
 
     return map

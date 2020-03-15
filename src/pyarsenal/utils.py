@@ -5,7 +5,7 @@ utils.py contains handy utility functions
 '''
 
 import numpy as _np
-import cPickle as _pickle
+import pickle as _pickle
 import pandas as _pd
 
 __all__ = [
@@ -51,7 +51,7 @@ def pickle(fname, data, mode='wb'):
     data  - data to pickle
     mode - mode to pickle (default: wb)
     '''
-    print 'pickling ... %s' % fname
+    print('pickling ... %s' % fname)
     try:
         _pickle.dump(data, open(fname, mode))
     except _pickle.PicklingError:
@@ -64,7 +64,7 @@ def unpickle(fname, mode='rb'):
     fname - filename to unpickle to
     mode - mode to unpickle (default: rb)
     '''
-    print 'unpickling ... %s' % fname
+    print('unpickling ... %s' % fname)
     try:
         data = _pickle.load(open(fname, mode))
     except _pickle.UnpicklingError:
@@ -73,7 +73,7 @@ def unpickle(fname, mode='rb'):
 
 
 def writeHDF(fname, vname, data, complevel=0, complib=None, fletcher32=False):
-    print 'writing ... %s' % fname
+    print('writing ... %s' % fname)
     try:
         hdf = _pd.HDFStore(fname,
                            complevel=complevel, complib=complib,
@@ -86,7 +86,7 @@ def writeHDF(fname, vname, data, complevel=0, complib=None, fletcher32=False):
 
 
 def readHDF(fname, vname, **kwargs):
-    print 'reading ... %s' % fname
+    print('reading ... %s' % fname)
     try:
         data = _pd.read_hdf(fname, vname, **kwargs)
     except RuntimeError:
@@ -129,6 +129,6 @@ def printcolour(text, colour='red'):
             'white': '\033[1;37m',
             'crimson': '\033[1;38m'
             }
-    print colours[colour] + text + colours['default']
+    print(colours[colour] + text + colours['default'])
     return
 printcolor = printcolour

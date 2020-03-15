@@ -142,7 +142,7 @@ class FortranIO(file):
             l=self._readSentinel()
             s = self.read(l)
             self._checkSentinel(l)
-        except IOError, e:
+        except IOError as e:
             self.seek(pos)
             raise e("String not read correctly from fortran file.  Incorrect format.")
         return s
@@ -194,10 +194,10 @@ class FortranIO(file):
             if shapes is None:
                 shapes=[None]*len(dtypes)
             return [self.readArray(dtype,shape) for dtype,shape in zip(dtypes,shapes)]
-        except IOError, e:
+        except IOError as e:
             self.tell(pos)
             raise e
-        except ValueError, e:
+        except ValueError as e:
             self.seek(pos)
             raise e
     def writeArrays(self,arrays):
@@ -235,11 +235,11 @@ class FortranIO(file):
         """
         pos=self.tell()
         try:
-            for i in xrange(n):
+            for i in range(n):
                 nb=self._readSentinel()
                 self.seek(nb,1) #seek from the current position
                 self._checkSentinel(nb)
-        except IOError, e:
+        except IOError as e:
             self.seek(pos)
             raise e
 
@@ -279,7 +279,7 @@ class FortranIO(file):
             if shape is not None:
                 data=data.reshape(shape)
             return data
-        except IOError, err:
+        except IOError as err:
             self.seek(pos)
             raise err
 
