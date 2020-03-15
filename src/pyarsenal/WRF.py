@@ -13,7 +13,7 @@ __all__ = ['ddx', 'ddy', 'vorticity',
            'ij_to_latlon', 'latlon_to_ij',
            'find_max_value', 'find_min_value', 'find_min_max']
 
-import _math as _math
+import math as _math
 import numpy as _np
 from netCDF4 import Dataset as _Dataset
 
