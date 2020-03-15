@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+# coding: utf-8 -*-
 
 '''
-lib_GSI.py contains utility functions for GSI
+GSI.py contains utility functions for GSI
 '''
 
 __all__ = ['GSIstat']

@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+# coding: utf-8 -*-
 
 '''
-lib_utils.py contains handy utility functions
+utils.py contains handy utility functions
 '''
 
 import numpy as _np
@@ -12,7 +12,8 @@ __all__ = [
             'float10Power', 'roundNumber',
             'pickle', 'unpickle',
             'writeHDF', 'readHDF',
-            'EmptyDataFrame'
+            'EmptyDataFrame',
+            'printcolour'
           ]
 
 

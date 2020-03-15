@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+# coding: utf-8 -*-
 
 '''
-lib_plotting.py contains plotting related functions
+plotting.py contains plotting related functions
 '''
 
 __all__ = ['rescale_cmap', 'make_cmap_from_RGB', 'get_cmap_NCARG',

@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+# coding: utf-8 -*-
 
 '''
-lib_GrADS.py contains an interface to PyGrADS object GrADS
+GrADS.py contains an interface to PyGrADS object GrADS
 It makes reading a binary grads and ctl file easy
 '''
 

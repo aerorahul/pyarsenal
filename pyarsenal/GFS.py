@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+# coding: utf-8 -*-
 
 '''
-lib_GFS.py contains utility functions for GFS
+GFS.py contains utility functions for GFS
 '''
 
 __all__ = ['get_akbk',

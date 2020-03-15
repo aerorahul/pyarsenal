@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+# coding: utf-8 -*-
 
 '''
-lib_specs.py contains region and variable specifications
+specs.py contains region and variable specifications
 '''
 
 import numpy as _np

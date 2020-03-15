@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# coding: utf-8 -*-
 
 '''
 mapping.py contains mapping related functions:

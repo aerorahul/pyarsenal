@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+# coding: utf-8 -*-
 
 '''
-lib_netCDF.py contains utility functions for netCDF files
+netCDF.py contains utility functions for netCDF files
 '''
 
 __all__ = ['variable_exist', 'read_netCDF_var']

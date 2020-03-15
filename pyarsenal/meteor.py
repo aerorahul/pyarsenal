@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# coding: utf-8 -*-
 
 '''
 meteor.py contains commonly used meteorological related functions
@@ -64,7 +64,7 @@ class meteor(object):
 
     def __init__(self):
         self.atmos_const = atmos_const()
-        pass
+        return
 
     def altimeter(self, pin, hin):
         ''' altimeter given pressure and altitude '''

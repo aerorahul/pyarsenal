@@ -1,14 +1,17 @@
-#!/usr/bin/env python
+# coding: utf-8 -*-
 
 '''
-lib_WRF.py contains WRF related functions:
-wrf_proj(filename)
-proj_set(proj)
-latlon_to_ij(lat,lon,proj)
-ij_to_latlon(i,j,proj)
+WRF.py contains WRF related functions:
+    wrf_proj(filename)
+    proj_set(proj)
+    latlon_to_ij(lat,lon,proj)
+    ij_to_latlon(i,j,proj)
 '''
 
-__all__ = []
+__all__ = ['ddx', 'ddy', 'vorticity',
+           'wrf_proj', 'proj_set',
+           'ij_to_latlon', 'latlon_to_ij',
+           'find_max_value', 'find_min_value', 'find_min_max']
 
 import _math as _math
 import numpy as _np

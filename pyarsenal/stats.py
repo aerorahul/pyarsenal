@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+# coding: utf-8 -*-
 
 '''
-lib_stats.py contains statistics utility functions
+stats.py contains statistics utility functions
 '''
 
 __all__ = ['mstats', 'lregress', 'ttest', 'get_weights', 'get_weighted_mean']
